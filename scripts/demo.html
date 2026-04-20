@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Digitális AI Index Session Demo</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 24px;
+        line-height: 1.5;
+      }
+
+      form {
+        display: grid;
+        gap: 12px;
+        max-width: 420px;
+        margin-bottom: 24px;
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+      }
+
+      input[type="number"] {
+        padding: 8px;
+      }
+
+      button {
+        width: 180px;
+        padding: 10px 12px;
+        cursor: pointer;
+      }
+
+      .card {
+        border: 1px solid #ccc;
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+
+      .meta {
+        color: #444;
+      }
+
+      pre {
+        white-space: pre-wrap;
+        word-break: break-word;
+        background: #f6f6f6;
+        padding: 12px;
+        overflow-x: auto;
+      }
+
+      ul {
+        margin-top: 8px;
+      }
+
+      #status {
+        margin: 16px 0;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>AI Session Demo</h1>
+
+    <form id="demo-form">
+      <label>
+        Profile ID
+        <input type="number" name="profileId" min="1" value="1" />
+      </label>
+
+      <label>
+        Megkötéses promptok
+        <input type="text" value="4 szezon / 1 motivációs csoport" readonly />
+      </label>
+
+      <label>
+        <input type="checkbox" name="saveToDb" />
+        Mentés adatbázisba
+      </label>
+
+      <button type="submit">Session futtatása</button>
+    </form>
+
+    <div id="status"></div>
+    <div id="result"></div>
+
+    <script>
+      const form = document.getElementById("demo-form");
+      const statusBox = document.getElementById("status");
+      const resultBox = document.getElementById("result");
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;");
+      }
+
+      function renderSources(sources) {
+        if (!sources || !sources.length) {
+          return "<p>Nincs source.</p>";
+        }
+
+        const items = sources
+          .map((source) => {
+            const title = escapeHtml(source.title || source.url || "Forrás");
+            const url = escapeHtml(source.url || "#");
+            return `<li><a href="${url}" target="_blank" rel="noreferrer">${title}</a></li>`;
+          })
+          .join("");
+
+        return `<ul>${items}</ul>`;
+      }
+
+      function renderBlock(title, item, extraMeta = "") {
+        return `
+          <section class="card">
+            <h2>${escapeHtml(title)}</h2>
+            ${extraMeta ? `<p class="meta">${extraMeta}</p>` : ""}
+            <p><strong>Completion ID:</strong> ${escapeHtml(item.completionId || "-")}</p>
+            <p><strong>Prompt:</strong></p>
+            <pre>${escapeHtml(item.prompt || "")}</pre>
+            <p><strong>Válasz:</strong></p>
+            <pre>${escapeHtml(item.answer || "")}</pre>
+            <p><strong>Források:</strong></p>
+            ${renderSources(item.sources)}
+            <details>
+              <summary>Nyers API JSON</summary>
+              <pre>${escapeHtml(JSON.stringify(item.rawApiResponse || null, null, 2))}</pre>
+            </details>
+          </section>
+        `;
+      }
+
+      function renderResult(data) {
+        const followUpsHtml = data.followUps
+          .map((item, index) => {
+            const meta = `${escapeHtml(item.interestType)} / ${escapeHtml(item.seasonName)} / ${escapeHtml(item.travelTimeFrame)}`;
+            return renderBlock(`Megkötéses prompt ${index + 1}`, item, meta);
+          })
+          .join("");
+
+        const comparisonHtml = data.comparison
+          ? renderBlock("Összehasonlító prompt", data.comparison)
+          : "";
+
+        const rawApiSession = {
+          altalanosPrompt: data.general.rawApiResponse || null,
+          megkotesesPromptok: data.followUps.map((item) => ({
+            erdeklodes: item.interestType,
+            szezon: item.seasonName,
+            nyersApiValasz: item.rawApiResponse || null,
+          })),
+          osszehasonlitoPrompt: data.comparison
+            ? {
+                erdeklodes: data.comparison.interestType,
+                szezon: data.comparison.seasonName,
+                nyersApiValasz: data.comparison.rawApiResponse || null,
+              }
+            : null,
+        };
+
+        return `
+          <section class="card">
+            <h2>Session adatok</h2>
+            <p><strong>Session ID:</strong> ${escapeHtml(data.sessionId)}</p>
+            <p><strong>Model:</strong> ${escapeHtml(data.modelName)}</p>
+            <p><strong>DB mentés:</strong> ${data.saveToDb ? "igen" : "nem"}</p>
+            <p><strong>Profil:</strong> ${escapeHtml(data.profile.profile_name)} / ${escapeHtml(data.profile.destination_name)}</p>
+          </section>
+
+          ${renderBlock("Általános prompt", data.general)}
+          ${followUpsHtml}
+          ${comparisonHtml}
+
+          <details class="card">
+            <summary>Session nyers API JSON</summary>
+            <pre>${escapeHtml(JSON.stringify(rawApiSession, null, 2))}</pre>
+          </details>
+        `;
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        statusBox.textContent = "Futás...";
+        resultBox.innerHTML = "";
+
+        const formData = new FormData(form);
+        const payload = {
+          profileId: Number(formData.get("profileId") || 1),
+          followUpLimit: 4,
+          saveToDb: formData.get("saveToDb") === "on",
+        };
+
+        try {
+          const response = await fetch("/run-session", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || "Ismeretlen hiba");
+          }
+
+          statusBox.textContent = "Kész.";
+          resultBox.innerHTML = renderResult(data);
+        } catch (error) {
+          statusBox.textContent = `Hiba: ${error.message}`;
+        }
+      });
+    </script>
+  </body>
+</html>

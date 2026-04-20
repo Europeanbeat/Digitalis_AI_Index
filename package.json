@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "main": "node scripts/main.js",
+    "demo": "node scripts/demo_server.js",
+    "general": "node scripts/general_prompt.js",
+    "constraint": "node scripts/constraint_prompt.js",
+    "comparison": "node scripts/comparison_prompt.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "openai": "^6.34.0",
+    "pg": "^8.20.0"
+  }
+}
