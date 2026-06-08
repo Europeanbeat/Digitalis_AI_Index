@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="820" viewBox="0 0 1600 820" role="img" aria-label="Profilalapú beszélgetési szál szerkezete">
+  <style>
+    .serif { font-family: "Source Serif 4", Georgia, serif; fill: #111418; }
+    .sans { font-family: Inter, Arial, sans-serif; }
+    .muted { fill: #5b6470; }
+    .muted2 { fill: #8a929c; }
+    .kicker { font-size: 20px; font-weight: 600; letter-spacing: 5.6px; text-transform: uppercase; }
+    .ntag { font-size: 16px; font-weight: 700; letter-spacing: 3.8px; text-transform: uppercase; }
+    .ntitle { font-size: 40px; font-weight: 700; }
+    .seasontitle { font-size: 30px; font-weight: 700; }
+    .seasonsub { font-size: 16px; font-weight: 600; letter-spacing: 3.2px; text-transform: uppercase; }
+  </style>
+
+  <line x1="90" y1="80" x2="1510" y2="80" stroke="#111418" stroke-width="2.5"/>
+  <text x="90" y="144" class="sans muted kicker">Profilalapú beszélgetési szál szerkezete</text>
+
+  <rect x="90" y="210" width="1420" height="110" fill="#ffffff" stroke="#111418" stroke-width="2"/>
+  <text x="800" y="254" text-anchor="middle" class="sans muted ntag">I · KIINDULÓ</text>
+  <text x="800" y="293" text-anchor="middle" class="serif ntitle">Általános prompt</text>
+
+  <line x1="800" y1="320" x2="800" y2="354" stroke="#111418" stroke-width="2"/>
+  <line x1="268" y1="354" x2="1332" y2="354" stroke="#111418" stroke-width="2"/>
+  <line x1="268" y1="354" x2="268" y2="390" stroke="#111418" stroke-width="2"/>
+  <line x1="622.7" y1="354" x2="622.7" y2="390" stroke="#111418" stroke-width="2"/>
+  <line x1="977.3" y1="354" x2="977.3" y2="390" stroke="#111418" stroke-width="2"/>
+  <line x1="1332" y1="354" x2="1332" y2="390" stroke="#111418" stroke-width="2"/>
+  <polygon points="268,400 260,386 276,386" fill="#111418"/>
+  <polygon points="622.7,400 614.7,386 630.7,386" fill="#111418"/>
+  <polygon points="977.3,400 969.3,386 985.3,386" fill="#111418"/>
+  <polygon points="1332,400 1324,386 1340,386" fill="#111418"/>
+
+  <rect x="90" y="434" width="1420" height="170" fill="none" stroke="#8a929c" stroke-width="1.5" stroke-dasharray="7 6"/>
+  <rect x="118" y="420" width="530" height="28" fill="#ffffff"/>
+  <text x="134" y="440" class="sans muted ntag">II · MEGKÖTÉSES · AZONOS TEMATIKAI KATEGÓRIA</text>
+
+  <rect x="116" y="464" width="322" height="94" fill="#ffffff" stroke="#111418" stroke-width="1.5"/>
+  <rect x="458" y="464" width="322" height="94" fill="#ffffff" stroke="#111418" stroke-width="1.5"/>
+  <rect x="800" y="464" width="322" height="94" fill="#ffffff" stroke="#111418" stroke-width="1.5"/>
+  <rect x="1142" y="464" width="322" height="94" fill="#ffffff" stroke="#111418" stroke-width="1.5"/>
+
+  <text x="277" y="509" text-anchor="middle" class="serif seasontitle">1. szezon</text>
+  <text x="277" y="541" text-anchor="middle" class="sans muted2 seasonsub">NYÁR</text>
+
+  <text x="619" y="509" text-anchor="middle" class="serif seasontitle">2. szezon</text>
+  <text x="619" y="541" text-anchor="middle" class="sans muted2 seasonsub">ŐSZ</text>
+
+  <text x="961" y="509" text-anchor="middle" class="serif seasontitle">3. szezon</text>
+  <text x="961" y="541" text-anchor="middle" class="sans muted2 seasonsub">TÉL</text>
+
+  <text x="1303" y="509" text-anchor="middle" class="serif seasontitle">4. szezon</text>
+  <text x="1303" y="541" text-anchor="middle" class="sans muted2 seasonsub">TAVASZ</text>
+
+  <line x1="277" y1="604" x2="277" y2="636" stroke="#111418" stroke-width="2"/>
+  <line x1="619" y1="604" x2="619" y2="636" stroke="#111418" stroke-width="2"/>
+  <line x1="961" y1="604" x2="961" y2="636" stroke="#111418" stroke-width="2"/>
+  <line x1="1303" y1="604" x2="1303" y2="636" stroke="#111418" stroke-width="2"/>
+  <line x1="277" y1="636" x2="1303" y2="636" stroke="#111418" stroke-width="2"/>
+  <line x1="800" y1="636" x2="800" y2="682" stroke="#111418" stroke-width="2"/>
+  <polygon points="800,694 792,680 808,680" fill="#111418"/>
+
+  <rect x="90" y="708" width="1420" height="110" fill="#ffffff" stroke="#111418" stroke-width="2"/>
+  <text x="800" y="752" text-anchor="middle" class="sans muted ntag">III · ZÁRÓ</text>
+  <text x="800" y="791" text-anchor="middle" class="serif ntitle">Összehasonlító prompt</text>
+</svg>

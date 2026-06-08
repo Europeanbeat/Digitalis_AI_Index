@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8" />
+<title>Panel C</title>
+<style>
+  :root{
+    --ink:#111418;
+    --muted:#5b6470;
+    --muted-2:#8a929c;
+    --rule:#c9ced4;
+    --rule-soft:#e4e7ea;
+    --tint:#f3f4f2;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#fff;color:var(--ink);font-family:Georgia, "Times New Roman", serif;}
+  #capture{
+    width:1600px;
+    padding:80px 90px 80px;
+    background:#fff;
+  }
+  .title{
+    font-family:Georgia, "Times New Roman", serif;
+    font-size:88px;font-weight:700;
+    line-height:1.05;letter-spacing:-.015em;
+    text-align:center;
+    margin:0 0 18px;
+  }
+  .kicker{
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:20px;
+    letter-spacing:.28em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:600;
+    text-align:center;
+    margin:0 0 60px;
+  }
+  .rule-top{border-top:2.5px solid var(--ink); padding-top:44px;}
+
+  .intro{
+    border:2px solid var(--ink);
+    padding:28px 34px;
+    margin-bottom:42px;
+    background:#fff;
+  }
+  .intro p{
+    margin:0;
+    font-size:30px;
+    line-height:1.45;
+  }
+
+  .count-grid{
+    display:grid;
+    grid-template-columns: repeat(6, 1fr);
+    border:2px solid var(--ink);
+    margin-bottom:52px;
+  }
+  .count-cell{
+    padding:34px 18px 28px;
+    border-right:1.25px solid var(--rule);
+    text-align:center;
+  }
+  .count-cell:last-child{border-right:none;background:var(--tint)}
+  .count-num{
+    font-size:82px;
+    font-weight:700;
+    line-height:1;
+    letter-spacing:-.02em;
+  }
+  .count-label{
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:17px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-top:18px;
+    font-weight:700;
+    line-height:1.4;
+  }
+
+  .row{
+    display:flex;
+    align-items:stretch;
+    gap:0;
+    margin-bottom:24px;
+  }
+  .row .gutter{
+    flex:0 0 150px;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    padding-top:26px;
+  }
+  .row .gutter::before{
+    content:"";
+    position:absolute;
+    left:50%; top:0; bottom:-24px;
+    width:1.5px; background:var(--rule);
+    transform:translateX(-0.75px);
+  }
+  .row:last-of-type .gutter::before{ bottom:0; }
+  .row .gutter .num{
+    position:relative;z-index:1;background:#fff;padding:4px 12px;
+    font-size:58px;font-weight:700;line-height:1;
+  }
+  .row .gutter .lbl{
+    position:relative;z-index:1;background:#fff;
+    margin-top:8px;padding:0 10px;
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:15px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--muted);font-weight:700;text-align:center;
+  }
+  .row .connector{
+    flex:0 0 40px;position:relative;
+  }
+  .row .connector::before{
+    content:"";
+    position:absolute;
+    left:0; right:0; top:54px;
+    height:1.5px; background:var(--rule);
+  }
+
+  .msg{
+    flex:1 1 auto;
+    border:2px solid var(--ink);
+    background:#fff;
+    padding:26px 34px 24px;
+  }
+  .msg.soft{ border-color:var(--muted); border-width:1.5px; }
+  .msg.result{ background:var(--tint); border-width:2.5px; }
+
+  .msg-head{
+    display:flex;justify-content:space-between;align-items:baseline;gap:20px;
+    border-bottom:1.25px solid var(--rule-soft);
+    padding-bottom:16px;margin-bottom:18px;
+    flex-wrap:wrap;
+  }
+  .msg-label{
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:18px;
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    color:var(--ink);font-weight:700;
+  }
+  .msg-sub{
+    font-size:22px;
+    color:var(--muted);
+    font-style:italic;
+  }
+  .msg-body{
+    font-size:26px;
+    line-height:1.45;
+  }
+  .msg-body strong{font-weight:700}
+  .formula{
+    font-size:54px;
+    line-height:1.2;
+    font-weight:700;
+    letter-spacing:-.02em;
+    text-align:center;
+    margin-top:8px;
+  }
+  .caption{
+    margin-top:36px;
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:18px;
+    color:var(--muted);
+    text-align:center;
+    letter-spacing:.03em;
+  }
+</style>
+</head>
+<body>
+
+<div id="capture">
+  <div class="rule-top">
+    <h1 class="title">Teljes promptmennyiség</h1>
+    <div class="kicker">Matematikai levezetés · kutatási design</div>
+  </div>
+
+  <div class="intro">
+    <p>Egy thread egy teljes, <strong>6 promptból álló</strong> beszélgetést jelent egy <strong>profilhoz</strong>, egy <strong>desztinációhoz</strong> és egy <strong>tematikus kategóriához</strong>. A teljes kutatási design ezt a logikát skálázza fel több modellen, ismétlésen és desztináción keresztül.</p>
+  </div>
+
+  <div class="count-grid">
+    <div class="count-cell">
+      <div class="count-num">6</div>
+      <div class="count-label">prompt<br/>/ thread</div>
+    </div>
+    <div class="count-cell">
+      <div class="count-num">3</div>
+      <div class="count-label">AI<br/>modell</div>
+    </div>
+    <div class="count-cell">
+      <div class="count-num">5</div>
+      <div class="count-label">heurisztikus<br/>ismétlés</div>
+    </div>
+    <div class="count-cell">
+      <div class="count-num">12</div>
+      <div class="count-label">profil</div>
+    </div>
+    <div class="count-cell">
+      <div class="count-num">7</div>
+      <div class="count-label">desztináció</div>
+    </div>
+    <div class="count-cell">
+      <div class="count-num">7</div>
+      <div class="count-label">tematikus<br/>kategória</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="gutter"><span class="num">1</span><span class="lbl">egység</span></div>
+    <div class="connector"></div>
+    <div class="msg">
+      <div class="msg-head">
+        <div class="msg-label">Kiinduló egység</div>
+        <div class="msg-sub">Egyetlen thread</div>
+      </div>
+      <div class="msg-body">
+        <strong>1 thread = 6 prompt</strong><br/>
+        1 általános prompt + 4 megkötéses prompt + 1 összehasonlító prompt
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="gutter"><span class="num">2</span><span class="lbl">modellek</span></div>
+    <div class="connector"></div>
+    <div class="msg soft">
+      <div class="msg-head">
+        <div class="msg-label">Modellek</div>
+        <div class="msg-sub">Párhuzamos összehasonlítás</div>
+      </div>
+      <div class="msg-body">
+        <strong>× 3 AI modell</strong><br/>
+        Ugyanaz a thread három különböző modellen fut le.
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="gutter"><span class="num">3</span><span class="lbl">ismétlés</span></div>
+    <div class="connector"></div>
+    <div class="msg soft">
+      <div class="msg-head">
+        <div class="msg-label">Heurisztikus ismétlések</div>
+        <div class="msg-sub">Válaszstabilitás vizsgálata</div>
+      </div>
+      <div class="msg-body">
+        <strong>× 5</strong><br/>
+        Ugyanaz a thread ötször ismétlődik modellenként, hogy a heurisztikus működésből adódó eltérések vizsgálhatók legyenek.
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="gutter"><span class="num">4</span><span class="lbl">profilok</span></div>
+    <div class="connector"></div>
+    <div class="msg soft">
+      <div class="msg-head">
+        <div class="msg-label">Profilok</div>
+        <div class="msg-sub">Profilváltozók</div>
+      </div>
+      <div class="msg-body">
+        <strong>× 12 profil</strong><br/>
+        A kutatás 12 profilvariánst használ.
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="gutter"><span class="num">5</span><span class="lbl">desztinációk</span></div>
+    <div class="connector"></div>
+    <div class="msg soft">
+      <div class="msg-head">
+        <div class="msg-label">Desztinációk</div>
+        <div class="msg-sub">Tóparti benchmark piacok</div>
+      </div>
+      <div class="msg-body">
+        <strong>× 7 desztináció</strong><br/>
+        A vizsgálat 7 különböző tóparti desztinációra terjed ki.
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="gutter"><span class="num">6</span><span class="lbl">kategóriák</span></div>
+    <div class="connector"></div>
+    <div class="msg soft">
+      <div class="msg-head">
+        <div class="msg-label">Tematikus kategóriák</div>
+        <div class="msg-sub">Wellness, gasztronómia, stb.</div>
+      </div>
+      <div class="msg-body">
+        <strong>× 7 tematikus kategória</strong><br/>
+        Minden profil–desztináció kombináció 7 külön kategóriában kerül vizsgálatra.
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="gutter"><span class="num">=</span><span class="lbl">eredmény</span></div>
+    <div class="connector"></div>
+    <div class="msg result">
+      <div class="msg-head">
+        <div class="msg-label">Végső számítás</div>
+        <div class="msg-sub">Teljes promptmennyiség</div>
+      </div>
+      <div class="formula">6 × 3 × 5 × 12 × 7 × 7 = 52 920</div>
+    </div>
+  </div>
+
+  <div class="caption">
+    A teljes promptmennyiség számításának logikája az AI-alapú turisztikai desztináció-ajánlási kutatási keretben.
+  </div>
+</div>
+</body>
+</html>

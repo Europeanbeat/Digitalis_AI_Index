@@ -5,7 +5,6 @@
 INSERT INTO profiles (
     profile_id,
     profile_name,
-    origin_country,
     profile_language,
     age,
     gender,
@@ -16,14 +15,13 @@ INSERT INTO profiles (
     destination_name
 ) VALUES (
     1,
-    'Fiatal pár (férfi)',
-    'Magyarországról',
-    'HU',
+    'Young couple (male)',
+    'EN',
     25,
-    'Férfi',
-    'párommal',
-    2,
+    'Male',
+    'with my partner',
+    3,
     100.00,
-    'közepes',
-    'Balatonra'
+    'medium',
+    'Lake Balaton'
 );

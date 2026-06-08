@@ -1,68 +1,108 @@
-
-
 CREATE TABLE profiles (
-    profile_id INT PRIMARY KEY, -- profilazonosító : P01, P02, stb 
-    profile_name VARCHAR(255) NOT NULL, -- pl. "Fiatal pár"
-    origin_country VARCHAR(255), -- származási ország
-    profile_language VARCHAR(50), -- prompt nyelve pl HU 
+    profile_id INT PRIMARY KEY, -- profilazonosító
+    profile_name VARCHAR(255) NOT NULL, -- pl. "Young couple (male)"
+    profile_language VARCHAR(50), -- prompt nyelve, pl. EN
     age INT, -- életkor
     gender VARCHAR(100), -- nem / identitás
-    travel_party VARCHAR(100), -- utazótárs típusa, pl. párban, egyedül, családdal, barátokkal
+    travel_party VARCHAR(100), -- utazótárs típusa, pl. with my partner
     stay_nights INT, -- tartózkodás hossza éjszakában
-    budget_per_day_eur DECIMAL(10, 2), -- napi költségkeret euróban 
-    price_sensitivity VARCHAR(100), -- árérzékenység, pl. alacsony / közepes / magas
-    destination_name VARCHAR(255) -- útazási desztináció
+    budget_per_day_eur DECIMAL(10, 2), -- napi költségkeret euróban
+    price_sensitivity VARCHAR(100), -- árérzékenység, pl. low / medium / high
+    destination_name VARCHAR(255) -- utazási desztináció
+);
+
+
+CREATE TABLE interest_groups (
+    interest_group_id INT PRIMARY KEY, -- fő termékcsoport azonosító
+    interest_type VARCHAR(255) NOT NULL UNIQUE, -- pl. Wellness, Gastronomy
+    interest_attributes TEXT, -- a csoporthoz tartozó tipikus preferenciák
+    motivation TEXT -- v2 prompt logika szerinti utazási motivációs kifejezés
 );
 
 
 CREATE TABLE travel_interests (
-    interest_id INT PRIMARY KEY, -- Motivációs id 
-    interest_type VARCHAR(255) NOT NULL, -- pl. wellness, gasztronómia
-    interest_attributes TEXT, -- pl. spa, szauna, borászat, túraútvonalak
-    season_name VARCHAR(100), -- pl. nyár, ősz, tél, tavasz
-    travel_time_frame VARCHAR(255) -- pl. "Június és Augusztus között"
+    interest_id INT PRIMARY KEY, -- szezonális variáns azonosító
+    interest_group_id INT NOT NULL REFERENCES interest_groups(interest_group_id),
+    season_name VARCHAR(100) NOT NULL, -- pl. Summer, Autumn, Winter, Spring
+    travel_time_frame VARCHAR(255) NOT NULL, -- pl. "between June and August"
+    UNIQUE (interest_group_id, season_name)
 );
 
 
-CREATE TABLE general_prompt_answers (
-    general_answer_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, -- automatikusan generált válaszazonosító
-    profile_id INT NOT NULL REFERENCES profiles(profile_id), -- melyik profilhoz tartozik
+CREATE TABLE session_runs (
+    session_id VARCHAR(255) PRIMARY KEY, -- egy teljes 6 promptos session azonosítója
+    profile_id INT NOT NULL REFERENCES profiles(profile_id),
+    interest_group_id INT NOT NULL REFERENCES interest_groups(interest_group_id),
+    repeat_index INT NOT NULL DEFAULT 1, -- heurisztikus ismétlés sorszáma
     destination_name VARCHAR(255), -- a futáskor használt desztináció neve
-    model_name VARCHAR(100), -- melyik modell adta a választ, pl. GPT / Gemini
-    session_id VARCHAR(255), -- az adott futás közös session / thread azonosítója
-    prompt_text TEXT, -- a ténylegesen elküldött általános prompt
-    general_prompt_answer TEXT, -- a modell nyers válasza
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- mentés időpontja
+    provider_name VARCHAR(100), -- pl. openai / anthropic / google
+    model_name VARCHAR(100), -- melyik modell futott
+    status VARCHAR(50) NOT NULL DEFAULT 'running', -- running / completed / failed
+    error_message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS session_runs_active_unique_idx
+ON session_runs (
+    profile_id,
+    interest_group_id,
+    repeat_index,
+    provider_name,
+    model_name
+)
+WHERE status IN ('running', 'completed');
+
+
+CREATE TABLE general_prompt_answers (
+    general_answer_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    session_id VARCHAR(255) NOT NULL REFERENCES session_runs(session_id),
+    profile_id INT NOT NULL REFERENCES profiles(profile_id),
+    destination_name VARCHAR(255),
+    repeat_index INT NOT NULL DEFAULT 1,
+    provider_name VARCHAR(100),
+    model_name VARCHAR(100),
+    prompt_text TEXT,
+    general_prompt_answer TEXT,
+    completion_id VARCHAR(255), -- OpenAI completion / response azonosító
+    sources_json JSONB, -- a web source lista nyers JSON formában
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
 CREATE TABLE constraint_prompt_answers (
-    constraint_answer_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, -- automatikusan generált válaszazonosító
-    profile_id INT NOT NULL REFERENCES profiles(profile_id), -- melyik profilhoz tartozik
-    interest_id INT NOT NULL REFERENCES travel_interests(interest_id), -- melyik érdeklődési / szezon variánshoz tartozik
-    destination_name VARCHAR(255), -- Általános promptban lévő desztináció neve
-    interest_type VARCHAR(255), -- érdeklődési típus, pl. wellness
-    season_name VARCHAR(100), -- szezon neve, pl. nyár
-    travel_time_frame VARCHAR(255), -- időablak, pl. "Június és Augusztus között"
-    model_name VARCHAR(100), -- melyik modell adta a választ
-    session_id VARCHAR(255), -- az adott 6 promptos futás közös session / thread azonosítója
-    prompt_text TEXT, -- a ténylegesen elküldött követő prompt
-    constraint_prompt_answer TEXT, -- a modell nyers válasza
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- mentés időpontja
+    constraint_answer_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    session_id VARCHAR(255) NOT NULL REFERENCES session_runs(session_id),
+    profile_id INT NOT NULL REFERENCES profiles(profile_id),
+    interest_id INT NOT NULL REFERENCES travel_interests(interest_id),
+    interest_group_id INT NOT NULL REFERENCES interest_groups(interest_group_id),
+    destination_name VARCHAR(255),
+    interest_type VARCHAR(255),
+    season_name VARCHAR(100),
+    travel_time_frame VARCHAR(255),
+    repeat_index INT NOT NULL DEFAULT 1,
+    provider_name VARCHAR(100),
+    model_name VARCHAR(100),
+    prompt_text TEXT,
+    constraint_prompt_answer TEXT,
+    completion_id VARCHAR(255),
+    sources_json JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
 CREATE TABLE comparison_prompt_results (
-    comparison_answer_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, -- automatikusan generált válaszazonosító
-    profile_id INT NOT NULL REFERENCES profiles(profile_id), -- melyik profilhoz tartozik
-    interest_id INT NOT NULL REFERENCES travel_interests(interest_id), -- melyik USP / szezon logikához kapcsolódik
-    destination_name VARCHAR(255), -- kiinduló desztináció, pl. Balaton
-    interest_type VARCHAR(255), -- összehasonlított érdeklődési típus
-    season_name VARCHAR(100), -- szezon neve
-    travel_time_frame VARCHAR(255), -- időablak
-    model_name VARCHAR(100), -- melyik modell adta a választ
-    session_id VARCHAR(255), -- az adott 6 promptos futás közös session / thread azonosítója
-    prompt_text TEXT, -- a ténylegesen elküldött összehasonlító prompt
-    comparison_prompt_answer TEXT, -- a modell nyers válasza
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- mentés időpontja
+    comparison_answer_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    session_id VARCHAR(255) NOT NULL REFERENCES session_runs(session_id),
+    profile_id INT NOT NULL REFERENCES profiles(profile_id),
+    interest_group_id INT NOT NULL REFERENCES interest_groups(interest_group_id),
+    destination_name VARCHAR(255),
+    interest_type VARCHAR(255),
+    repeat_index INT NOT NULL DEFAULT 1,
+    provider_name VARCHAR(100),
+    model_name VARCHAR(100),
+    prompt_text TEXT,
+    comparison_prompt_answer TEXT,
+    completion_id VARCHAR(255),
+    sources_json JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Digitális AI Index — Architecture</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+  body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; margin: 0; background: #f7f8fa; color: #1f2329; }
+  header { background: #1f2329; color: #fff; padding: 22px 32px; }
+  header h1 { margin: 0; font-size: 22px; }
+  header p { margin: 6px 0 0; color: #b8bdc4; font-size: 14px; }
+  .card { background: #fff; margin: 24px 32px; padding: 20px 24px; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .card h2 { margin: 0 0 4px; font-size: 17px; }
+  .card .sub { margin: 0 0 16px; color: #6b7178; font-size: 13px; }
+  .mermaid { display: flex; justify-content: center; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Digitális AI Index — Architecture</h1>
+  <p>Research data-collection pipeline · AI lakeside-tourism recommendations · PostgreSQL-backed</p>
+</header>
+
+<div class="card">
+  <h2>1 · Module &amp; dependency layout</h2>
+  <p class="sub">Scripts, SQL layer, and external services.</p>
+  <div class="mermaid" id="d1">
+flowchart TB
+    subgraph ENTRY["Entry points (scripts/)"]
+        MAIN["main.js — single-session test runner"]
+        BATCH["model_batch.js — large batch runner"]
+    end
+    subgraph CORE["Core engine"]
+        FLOW["session_flow.js — orchestration + DB I/O + prompts"]
+    end
+    subgraph CONFIG["Configuration"]
+        ENV[".env — PG* + OPENAI_API_KEY + OPENAI_MODEL/AI_PROVIDER"]
+        PKG["package.json — openai · pg · dotenv"]
+    end
+    subgraph SQL["sql/ (schema &amp; seeds)"]
+        CREATE["create_db.sql — base schema v1"]
+        MIG["004_migrate_live_db_to_v2.sql"]
+        SEEDP["002_insert_sample_profile.sql"]
+        SEEDI["003_seed_travel_interests.sql"]
+    end
+    subgraph EXT["External services"]
+        OPENAI["OpenAI Chat Completions API — gpt-4o-search-preview"]
+        PG[("PostgreSQL — digital_ai_index_db")]
+    end
+    MAIN -->|runSession| FLOW
+    BATCH -->|getAllProfiles / runSession| FLOW
+    FLOW -->|reads| ENV
+    FLOW -->|chat.completions.create| OPENAI
+    FLOW -->|pg Client per session| PG
+    BATCH -->|pg Client skip checks| PG
+    CREATE -.defines.-> PG
+    MIG -.alters.-> PG
+    SEEDP -.seeds.-> PG
+    SEEDI -.seeds.-> PG
+    PKG -.deps.-> FLOW
+  </div>
+</div>
+
+<div class="card">
+  <h2>2 · Session logic — the 6-prompt branched thread</h2>
+  <p class="sub">General answer establishes a baseline; each follow-up forks from it (seasons never see each other).</p>
+  <div class="mermaid" id="d2">
+flowchart TD
+    START([runSession]) --> LOADP["getProfile(profileId)"]
+    LOADP --> LOADI["getTravelInterests — 4 seasonal rows"]
+    LOADI --> SID["createSessionId"]
+    SID --> INSROW["INSERT session_runs — status = running"]
+    INSROW --> GP["Build GENERAL prompt"]
+    GP --> GCALL["API call #1"]
+    GCALL --> GANS["general answer"]
+    GANS --> SAVEG[("save general_prompt_answers")]
+    GANS --> BASE["base = general Q + general A — cloned snapshot"]
+    BASE --> B1["base + Summer"]
+    BASE --> B2["base + Autumn"]
+    BASE --> B3["base + Winter"]
+    BASE --> B4["base + Spring"]
+    BASE --> B5["base + Comparison"]
+    B1 --> C1["API #2"] --> S1[("constraint_prompt_answers")]
+    B2 --> C2["API #3"] --> S2[("constraint_prompt_answers")]
+    B3 --> C3["API #4"] --> S3[("constraint_prompt_answers")]
+    B4 --> C4["API #5"] --> S4[("constraint_prompt_answers")]
+    B5 --> C5["API #6"] --> S5[("comparison_prompt_results")]
+    S1 --> DONE["UPDATE session_runs — status = completed"]
+    S2 --> DONE
+    S3 --> DONE
+    S4 --> DONE
+    S5 --> DONE
+    DONE --> END([return result + trace])
+    GCALL -. on error .-> FAIL["UPDATE session_runs — status = failed"]
+    C1 -. on error .-> FAIL
+    FAIL --> ENDERR([throw])
+    classDef api fill:#e8f0fe,stroke:#4285f4;
+    classDef db fill:#e6f4ea,stroke:#34a853;
+    classDef err fill:#fce8e6,stroke:#ea4335;
+    class GCALL,C1,C2,C3,C4,C5 api;
+    class SAVEG,S1,S2,S3,S4,S5,INSROW,DONE db;
+    class FAIL,ENDERR err;
+  </div>
+</div>
+
+<div class="card">
+  <h2>3 · Batch runner — combinatorial loop with skip/resume</h2>
+  <p class="sub">profile × group × repeat for one model/provider (set via env).</p>
+  <div class="mermaid" id="d3">
+flowchart TD
+    BSTART([model_batch.js]) --> CONN["connect pg Client"]
+    CONN --> LP["getAllProfiles()"]
+    LP --> LG["getInterestGroupRows()"]
+    LG --> CALC["totalSessions = profiles × groups × REPEAT_COUNT"]
+    CALC --> OUTER{"for each profile"}
+    OUTER --> MID{"for each interest group"}
+    MID --> INNER{"for repeat = 1..REPEAT_COUNT"}
+    INNER --> SKIP{"--save &amp;&amp; already completed?"}
+    SKIP -->|yes| COUNTSKIP["skipped++ ; continue"]
+    SKIP -->|no| RUN["runSession(...)"]
+    RUN -->|success| OK["successful++"]
+    RUN -->|throws| CATCH["failed++ ; log ; continue"]
+    OK --> DELAY{"SESSION_DELAY_MS &gt; 0 ?"}
+    CATCH --> DELAY
+    COUNTSKIP --> INNER
+    DELAY -->|sleep| INNER
+    DELAY -->|next| INNER
+    INNER -->|done| MID
+    MID -->|done| OUTER
+    OUTER -->|done| REPORT["print successful / skipped / failed / elapsed"]
+    REPORT --> BEND([end])
+    classDef warn fill:#fef7e0,stroke:#f9ab00;
+    class SKIP,DELAY warn;
+  </div>
+</div>
+
+<div class="card">
+  <h2>4 · Database schema (ER diagram)</h2>
+  <p class="sub">7 tables. session_runs is the audit header; answer tables are denormalized for export.</p>
+  <div class="mermaid" id="d4">
+erDiagram
+    profiles ||--o{ session_runs : "profile_id"
+    interest_groups ||--o{ travel_interests : "interest_group_id"
+    interest_groups ||--o{ session_runs : "interest_group_id"
+    session_runs ||--|| general_prompt_answers : "1 per session"
+    session_runs ||--o{ constraint_prompt_answers : "4 per session"
+    session_runs ||--|| comparison_prompt_results : "1 per session"
+    travel_interests ||--o{ constraint_prompt_answers : "interest_id"
+    profiles {
+        int profile_id PK
+        varchar profile_name
+        varchar profile_language
+        int age
+        varchar gender
+        varchar travel_party
+        int stay_nights
+        decimal budget_per_day_eur
+        varchar price_sensitivity
+        varchar destination_name
+    }
+    interest_groups {
+        int interest_group_id PK
+        varchar interest_type UK
+        text interest_attributes
+    }
+    travel_interests {
+        int interest_id PK
+        int interest_group_id FK
+        varchar season_name
+        varchar travel_time_frame
+    }
+    session_runs {
+        varchar session_id PK
+        int profile_id FK
+        int interest_group_id FK
+        int repeat_index
+        varchar destination_name
+        varchar provider_name
+        varchar model_name
+        varchar status
+        text error_message
+        timestamp created_at
+    }
+    general_prompt_answers {
+        int general_answer_id PK
+        varchar session_id FK
+        int profile_id FK
+        varchar destination_name
+        int repeat_index
+        text prompt_text
+        text general_prompt_answer
+        varchar completion_id
+        jsonb sources_json
+        timestamp created_at
+    }
+    constraint_prompt_answers {
+        int constraint_answer_id PK
+        varchar session_id FK
+        int interest_id FK
+        int interest_group_id FK
+        varchar interest_type
+        varchar season_name
+        varchar travel_time_frame
+        int repeat_index
+        text prompt_text
+        text constraint_prompt_answer
+        varchar completion_id
+        jsonb sources_json
+    }
+    comparison_prompt_results {
+        int comparison_answer_id PK
+        varchar session_id FK
+        int interest_group_id FK
+        varchar interest_type
+        int repeat_index
+        text prompt_text
+        text comparison_prompt_answer
+        varchar completion_id
+        jsonb sources_json
+    }
+  </div>
+</div>
+
+<div class="card">
+  <h2>5 · End-to-end pipeline (collection → analysis)</h2>
+  <p class="sub">Solid = implemented in this repo. Dashed = later methodology phases, not yet in code.</p>
+  <div class="mermaid" id="d5">
+flowchart LR
+    subgraph DIM["Research dimensions"]
+        P["P profiles"]
+        D["D destinations"]
+        G["G groups"]
+        M["M models"]
+        R["R repeats"]
+    end
+    DIM --> GEN["Combinatorial session generation — P×D×G×M×R"]
+    GEN --> COLLECT["session_flow.js — 6 prompts / session"]
+    COLLECT --> STORE[("PostgreSQL — 7 rows / session")]
+    STORE --> EXPORT["Excel / CSV export"]
+    STORE -.future.-> NER["Entity extraction (NER) + normalization"]
+    NER -.future.-> RANK["Rank + co-occurrence structuring"]
+    RANK -.future.-> SCORE["AI Visibility Score — 5 dimensions"]
+    SCORE -.future.-> BENCH["Benchmarking vs. competitors"]
+    classDef impl fill:#e6f4ea,stroke:#34a853;
+    classDef future fill:#f1f3f4,stroke:#9aa0a6,stroke-dasharray:4 3;
+    class GEN,COLLECT,STORE,EXPORT impl;
+    class NER,RANK,SCORE,BENCH future;
+  </div>
+</div>
+
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: "default", flowchart: { useMaxWidth: true } });
+</script>
+</body>
+</html>

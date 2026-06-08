@@ -1,0 +1,102 @@
+<svg width="1240" height="1754" viewBox="0 0 1240 1754" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Promptszámítási diagram</title>
+  <desc id="desc">Akadémikus stílusú ábra az egy thread felépítéséről és a teljes promptmennyiség levezetéséről.</desc>
+  <defs>
+    <style>
+      .bg { fill: #ffffff; }
+      .panel { fill: #fafafa; stroke: #c8cdd4; stroke-width: 2; rx: 18; ry: 18; }
+      .box { fill: #ffffff; stroke: #9aa3ad; stroke-width: 2; rx: 14; ry: 14; }
+      .box-soft { fill: #f5f7fa; stroke: #b9c1ca; stroke-width: 2; rx: 14; ry: 14; }
+      .line { stroke: #6b7280; stroke-width: 3; fill: none; }
+      .title { font-family: Arial, Helvetica, sans-serif; font-size: 34px; font-weight: 700; fill: #111827; }
+      .panel-title { font-family: Arial, Helvetica, sans-serif; font-size: 28px; font-weight: 700; fill: #111827; }
+      .h1 { font-family: Arial, Helvetica, sans-serif; font-size: 24px; font-weight: 700; fill: #111827; }
+      .h2 { font-family: Arial, Helvetica, sans-serif; font-size: 21px; font-weight: 700; fill: #1f2937; }
+      .body { font-family: Arial, Helvetica, sans-serif; font-size: 19px; fill: #374151; }
+      .small { font-family: Arial, Helvetica, sans-serif; font-size: 17px; fill: #4b5563; }
+      .formula { font-family: Arial, Helvetica, sans-serif; font-size: 32px; font-weight: 700; fill: #111827; }
+      .result { font-family: Arial, Helvetica, sans-serif; font-size: 38px; font-weight: 700; fill: #0f172a; }
+      .muted { fill: #6b7280; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1240" height="1754"/>
+
+  <text class="title" x="80" y="78">AI-alapú turisztikai kutatási design: a teljes promptmennyiség levezetése</text>
+  <text class="body" x="80" y="118">Az ábra azt mutatja be, hogyan jutunk el egyetlen 6 promptos threadtől a teljes kutatási promptmennyiségig.</text>
+
+  <!-- Panel A -->
+  <rect class="panel" x="60" y="160" width="1120" height="520"/>
+  <text class="panel-title" x="90" y="210">A panel. Egy thread felépítése</text>
+  <text class="body" x="90" y="246">Egy thread egy teljes beszélgetési szálat jelent egy profilhoz, egy desztinációhoz és egy tematikus kategóriához.</text>
+  <text class="small" x="90" y="278">A négy megkötéses prompt ugyanazon tematikus kategória négy szezonális változatát fedi le.</text>
+
+  <rect class="box" x="110" y="332" width="230" height="150"/>
+  <text class="h2" x="140" y="380">1 általános prompt</text>
+  <text class="body" x="140" y="420">Profilalapú</text>
+  <text class="body" x="140" y="448">kiinduló kérdés</text>
+
+  <rect class="box" x="505" y="312" width="230" height="190"/>
+  <text class="h2" x="530" y="362">4 megkötéses</text>
+  <text class="h2" x="530" y="390">prompt</text>
+  <text class="body" x="530" y="430">Nyár</text>
+  <text class="body" x="530" y="458">Ősz</text>
+  <text class="body" x="530" y="486">Tél</text>
+  <text class="body" x="610" y="430">Tavasz</text>
+
+  <rect class="box" x="900" y="332" width="220" height="150"/>
+  <text class="h2" x="930" y="380">1 összehasonlító</text>
+  <text class="h2" x="930" y="408">prompt</text>
+  <text class="body" x="930" y="448">Más tóparti</text>
+  <text class="body" x="930" y="476">desztinációk</text>
+
+  <line class="line" x1="340" y1="407" x2="505" y2="407" marker-end="url(#arrow)"/>
+  <line class="line" x1="735" y1="407" x2="900" y2="407" marker-end="url(#arrow)"/>
+
+  <rect class="box-soft" x="340" y="556" width="560" height="82"/>
+  <text class="formula" x="410" y="608">1 + 4 + 1 = 6 prompt / thread</text>
+
+  <!-- Panel B -->
+  <rect class="panel" x="60" y="730" width="1120" height="940"/>
+  <text class="panel-title" x="90" y="780">B panel. A teljes promptmennyiség számítása</text>
+  <text class="body" x="90" y="816">A teljes kutatási design több szinten skálázza fel az egyetlen thread logikáját.</text>
+
+  <rect class="box" x="110" y="870" width="1020" height="94"/>
+  <text class="h2" x="140" y="920">1. Egység</text>
+  <text class="body" x="290" y="920">1 thread = 6 prompt</text>
+  <text class="small" x="540" y="920">1 általános + 4 megkötéses + 1 összehasonlító</text>
+
+  <rect class="box" x="110" y="988" width="1020" height="94"/>
+  <text class="h2" x="140" y="1038">2. Modellek</text>
+  <text class="body" x="290" y="1038">× 3 AI modell</text>
+  <text class="small" x="540" y="1038">ugyanaz a thread három különböző modellen fut le</text>
+
+  <rect class="box" x="110" y="1106" width="1020" height="108"/>
+  <text class="h2" x="140" y="1156">3. Heurisztikus ismétlések</text>
+  <text class="body" x="520" y="1156">× 5</text>
+  <text class="small" x="600" y="1142">ugyanaz a thread ötször ismétlődik modellenként,</text>
+  <text class="small" x="600" y="1168">hogy a válaszok stabilitása és eltérése vizsgálható legyen</text>
+
+  <rect class="box" x="110" y="1238" width="1020" height="94"/>
+  <text class="h2" x="140" y="1288">4. Profilok</text>
+  <text class="body" x="290" y="1288">× 12 profil</text>
+  <text class="small" x="540" y="1288">a kutatás 12 profilváltozót alkalmaz</text>
+
+  <rect class="box" x="110" y="1356" width="1020" height="94"/>
+  <text class="h2" x="140" y="1406">5. Desztinációk</text>
+  <text class="body" x="290" y="1406">× 7 desztináció</text>
+  <text class="small" x="540" y="1406">a vizsgálat 7 különböző tóparti desztinációra terjed ki</text>
+
+  <rect class="box" x="110" y="1474" width="1020" height="94"/>
+  <text class="h2" x="140" y="1524">6. Tematikus kategóriák</text>
+  <text class="body" x="290" y="1524">× 7 tematikus kategória</text>
+  <text class="small" x="540" y="1524">minden profil–desztináció kombináció 7 külön kategóriában fut le</text>
+
+  <rect class="box-soft" x="210" y="1598" width="820" height="48"/>
+  <text class="formula" x="250" y="1634">6 × 3 × 5 × 12 × 7 × 7 = 52 920 prompt</text>
+
+  <text class="small muted" x="90" y="1704">Megjegyzés: az ábra A4 méretű dokumentumba vagy Google Sheets oldalra illeszthető, nagy betűmérettel és letisztult akadémikus szerkezettel.</text>
+</svg>

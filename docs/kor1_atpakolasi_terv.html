@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <title>1. kör – átpakolási terv</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --ink:#111418;
+      --muted:#5b6470;
+      --rule:#d8dde2;
+      --tint:#f5f6f4;
+      --tint-2:#fbfbfa;
+      --accent:#eef1f4;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:#fff;color:var(--ink)}
+    body{font-family:"Source Serif 4", Georgia, serif;}
+    .page{
+      max-width:1040px;
+      margin:0 auto;
+      padding:56px 56px 72px;
+    }
+    .rule-top{
+      border-top:2.5px solid var(--ink);
+      padding-top:26px;
+      margin-bottom:28px;
+    }
+    .kicker{
+      font-family:"Inter", Arial, sans-serif;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.22em;
+      font-size:13px;
+      font-weight:700;
+      margin:0 0 10px;
+    }
+    h1{
+      font-size:34px;
+      line-height:1.12;
+      margin:0 0 10px;
+      font-weight:700;
+      letter-spacing:-.02em;
+    }
+    .lead{
+      font-size:18px;
+      line-height:1.58;
+      margin:0 0 28px;
+    }
+    h2{
+      font-size:25px;
+      margin:34px 0 14px;
+      line-height:1.2;
+    }
+    h3{
+      font-size:20px;
+      margin:24px 0 12px;
+      line-height:1.25;
+    }
+    p, li{
+      font-size:17px;
+      line-height:1.62;
+    }
+    ul,ol{
+      margin:10px 0 0 0;
+      padding-left:24px;
+    }
+    .note{
+      background:var(--tint);
+      border:1px solid var(--rule);
+      padding:16px 18px;
+      margin:18px 0 24px;
+    }
+    .small{
+      font-size:15px;
+      color:var(--muted);
+    }
+    .mono{
+      font-family:"Inter", Arial, sans-serif;
+      font-weight:600;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin:18px 0 28px;
+      table-layout:fixed;
+    }
+    th, td{
+      border:1px solid var(--rule);
+      padding:14px 14px;
+      vertical-align:top;
+      text-align:left;
+    }
+    th{
+      background:var(--accent);
+      font-family:"Inter", Arial, sans-serif;
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      color:var(--muted);
+      font-weight:700;
+    }
+    td{
+      background:var(--tint-2);
+      font-size:16px;
+      line-height:1.55;
+    }
+    .outline{
+      border:1px solid var(--rule);
+      background:var(--tint-2);
+      padding:18px 20px;
+      margin:14px 0 24px;
+    }
+    .outline p{
+      margin:0 0 8px;
+    }
+    .delmap{
+      border:1px solid var(--rule);
+      background:var(--tint);
+      padding:18px 20px;
+      margin:14px 0 24px;
+    }
+    .delmap p{
+      margin:0 0 10px;
+    }
+    del{
+      color:#7b828c;
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="rule-top">
+      <p class="kicker">1. kör · csak átpakolás</p>
+      <h1>Átpakolási terv a <span class="mono">PwC_Digitális_AI_Érettségi_Index (4)</span> dokumentumhoz</h1>
+      <p class="lead">
+        Ez a dokumentum csak az első körös szerkezeti rendezést mutatja. Ebben a körben még nincs teljes átírás:
+        csak azt rakjuk rendbe, hogy mi legyen jó helyen a mostani PDF-ben Ádám kommentje alapján
+        (<span class="mono">„Az adatgyűjtés módszertana innentől világos, hozzá kéne húzni a meglévő fejezeteket.”</span>).
+      </p>
+    </div>
+
+    <div class="note">
+      <p><strong>Ebben a körben nem cél</strong> a teljes módszertani szöveg újraírása.</p>
+      <p class="small">A cél: a most már világos prompt-alapú adatgyűjtési logikát a meglévő fejezetszerkezetbe illeszteni, és megszüntetni a lebegő vagy rossz helyen lévő blokkokat.</p>
+    </div>
+
+    <h2>1. Mit jelent most az „áthúzás”?</h2>
+    <div class="delmap">
+      <p><strong>A legfontosabb elmozdítás:</strong></p>
+      <p><del>Melléklet C: Kérdések</del> → <strong>2.1.1. Kutatási kérdések</strong></p>
+      <p class="small">Tehát ez a blokk megszűnik mellékletként, és visszamegy a főszövegbe.</p>
+    </div>
+
+    <h2>2. Mi marad a helyén az első körben?</h2>
+    <ul>
+      <li><span class="mono">Bevezetés</span> marad.</li>
+      <li><span class="mono">1. fejezet</span> marad.</li>
+      <li><span class="mono">2.1–2.8</span> szerkezeti helye marad.</li>
+      <li><span class="mono">3. fejezet</span> marad külön operatív fejezetként.</li>
+      <li><span class="mono">Melléklet A, B, D, E</span> marad mellékletben.</li>
+    </ul>
+
+    <h2>3. Mi változik az első körben?</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Most hol van</th>
+          <th>Hova menjen</th>
+          <th>Művelet most</th>
+          <th>Miért</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Melléklet C: Kérdések</strong><br><span class="small">24–25. oldal</span></td>
+          <td><strong>2.1.1. Kutatási kérdések</strong></td>
+          <td>Átmozgatás</td>
+          <td>Ez nem háttéranyag, hanem a módszertan egyik alapindoklása.</td>
+        </tr>
+        <tr>
+          <td><strong>3.4. Ábrák</strong></td>
+          <td><strong>Marad 3.4 alatt</strong></td>
+          <td>Marad</td>
+          <td>Jó helyen van. Ha valamelyik ábra nincs bent, elég jelölni a helyét.</td>
+        </tr>
+        <tr>
+          <td><strong>Melléklet A: Profil variánsok</strong></td>
+          <td><strong>Marad melléklet</strong></td>
+          <td>Marad</td>
+          <td>Háttéranyag, nem kell a főszövegbe húzni.</td>
+        </tr>
+        <tr>
+          <td><strong>Melléklet B: Desztináció tematikus termékcsoportok</strong></td>
+          <td><strong>Marad melléklet</strong></td>
+          <td>Marad</td>
+          <td>Operatív támogatás, nem főszöveges módszertani blokk.</td>
+        </tr>
+        <tr>
+          <td><strong>Melléklet D: Profilok</strong></td>
+          <td><strong>Marad melléklet</strong></td>
+          <td>Marad</td>
+          <td>Részletes lista, nem kell most a főszövegbe emelni.</td>
+        </tr>
+        <tr>
+          <td><strong>Melléklet E: Adatbázis struktúra ábrája</strong></td>
+          <td><strong>Marad melléklet</strong></td>
+          <td>Marad</td>
+          <td>Technikai háttéranyag.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>4. Így nézzen ki a cél-tartalomjegyzék az első kör után</h2>
+    <div class="outline">
+      <p><strong>Bevezetés</strong></p>
+      <p><strong>1.</strong> AI-alapú desztinációs láthatóság (AI visibility) értelmezése és mérési megközelítései</p>
+      <p><strong>2.</strong> Methodology – AI-alapú desztinációs láthatóság (AI Visibility) mérése és benchmarking keretrendszer</p>
+      <p><span class="mono">2.1</span> Kutatási megközelítés és célrendszer</p>
+      <p><span class="mono">2.1.1</span> Kutatási kérdések</p>
+      <p><span class="mono">2.2</span> Módszertani keret és kutatási design</p>
+      <p><span class="mono">2.3</span> Adatgyűjtési volumen és modellek</p>
+      <p><span class="mono">2.4</span> Adatkinyerés és strukturálás</p>
+      <p><span class="mono">2.5–2.8</span> marad</p>
+      <p><strong>3.</strong> Prompt-alapú adatgyűjtési keret</p>
+      <p><span class="mono">3.1</span> Keretrendszer</p>
+      <p><span class="mono">3.2</span> Profilalapú beszélgetési lánc</p>
+      <p><span class="mono">3.2.1</span> Általános prompt</p>
+      <p><span class="mono">3.2.2</span> Megkötéses promptok</p>
+      <p><span class="mono">3.2.3</span> Összehasonlító prompt</p>
+      <p><span class="mono">3.3</span> Felfedező (EU desztinációs) promptok</p>
+      <p><span class="mono">3.4</span> Ábrák</p>
+      <p><strong>Melléklet A</strong> Profil variánsok</p>
+      <p><strong>Melléklet B</strong> Desztináció tematikus termékcsoportok</p>
+      <p><strong>Melléklet D</strong> Profilok</p>
+      <p><strong>Melléklet E</strong> Adatbázis struktúra ábrája</p>
+    </div>
+
+    <h2>5. Mit tegyél az ábrákkal, ha még nincsenek bent?</h2>
+    <div class="note">
+      <p><strong>Most elég a helyüket jelezni.</strong></p>
+      <ul>
+        <li><span class="mono">1 Ábra: Profilalapú beszélgetési szál szerkezete</span></li>
+        <li><span class="mono">2 Ábra: Wellness tematikájú beszélgetési szál</span></li>
+        <li><span class="mono">3 Ábra: Skálázási logika</span></li>
+      </ul>
+      <p class="small">Ha valamelyik ábra még nincs fizikailag beillesztve, elég ideiglenesen ennyit írni: <span class="mono">[1. ábra helye]</span>.</p>
+    </div>
+
+    <h2>6. Mihez lehet majd a 2. körben hozzányúlni?</h2>
+    <p>Ha az első körös átpakolás kész, akkor lehet ténylegesen átírni és bővíteni ezeket:</p>
+    <ul>
+      <li><span class="mono">2.2</span> – audit-alapú, profilalapú, izolált beszélgetési szálas módszertani megfogalmazás</li>
+      <li><span class="mono">2.3</span> – pontos promptmennyiség, modellek, heurisztikus ismétlés logikája</li>
+      <li><span class="mono">3.1</span> – a beszélgetési szál feszesebb, akadémikusabb leírása</li>
+    </ul>
+    <div class="note">
+      <p><strong>Itt már lehet használni az Andreev-cikk logikáját is mint nyelvi mintát</strong>, de nem másolva, hanem a saját Balaton-specifikus designra ráírva.</p>
+      <p class="small">Tehát: az első kör csak szerkezeti rendezés. A második kör lesz a tényleges módszertani átírás és bővítés.</p>
+    </div>
+
+    <h2>7. Milyen sorrendben indulj el?</h2>
+    <ol>
+      <li>Vedd ki a <span class="mono">Kérdések</span> blokkot a mellékletből.</li>
+      <li>Tedd be <span class="mono">2.1.1. Kutatási kérdések</span> cím alá.</li>
+      <li>Ellenőrizd, hogy a <span class="mono">3. fejezet</span> maradjon egyben.</li>
+      <li>Az ábrák helyét hagyd meg vagy jelöld, ha még nincsenek bent.</li>
+      <li>A mellékletekből csak a <span class="mono">Kérdések</span> jöjjön vissza, a többi maradjon a végén.</li>
+    </ol>
+
+    <div class="note">
+      <p><strong>A legfontosabb üzenet:</strong> első körben nem kell bizonyítanod, hogy minden mondat végleges. Elég, ha a dokumentum szerkezete már logikus és védhető.</p>
+    </div>
+  </main>
+</body>
+</html>

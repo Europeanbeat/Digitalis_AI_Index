@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8" />
+<title>Panel A</title>
+<style>
+  :root{
+    --ink:#111418;
+    --muted:#5b6470;
+    --muted-2:#8a929c;
+    --rule:#c9ced4;
+    --tint:#f3f4f2;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#fff;color:var(--ink);font-family:Georgia, "Times New Roman", serif;}
+  #capture{
+    width:1600px;
+    padding:80px 90px 80px;
+    background:#fff;
+  }
+  .title{
+    font-family:Georgia, "Times New Roman", serif;
+    font-size:88px;font-weight:700;
+    line-height:1.05;letter-spacing:-.015em;
+    text-align:center;
+    margin:0 0 18px;
+  }
+  .kicker{
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:20px;
+    letter-spacing:.28em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:600;
+    text-align:center;
+    margin:0 0 60px;
+  }
+  .rule-top{border-top:2.5px solid var(--ink); padding-top:44px;}
+
+  .a-counts{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    border:2px solid var(--ink);
+    margin-bottom:54px;
+  }
+  .count-cell{
+    padding:40px 20px 32px;
+    border-right:1.25px solid var(--rule);
+    text-align:center;
+  }
+  .count-cell:last-child{border-right:none;background:var(--tint)}
+  .count-num{
+    font-family:Georgia, "Times New Roman", serif;
+    font-size:96px;font-weight:700;
+    line-height:1;letter-spacing:-.02em;
+  }
+  .count-label{
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:18px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-top:22px;
+    font-weight:600;line-height:1.35;
+  }
+
+  .node{
+    border:2px solid var(--ink);
+    padding:30px 28px;
+    background:#fff;
+  }
+  .node .n-tag{
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:16px;
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:700;
+    margin-bottom:10px;
+  }
+  .node .n-title{
+    font-family:Georgia, "Times New Roman", serif;
+    font-size:40px;
+    font-weight:700;
+    letter-spacing:-.01em;
+  }
+  .lvl1 .node{ text-align:center }
+
+  .lvl2{
+    display:grid;
+    grid-template-columns: repeat(4,1fr);
+    gap:20px;
+  }
+  .lvl2 .node{text-align:center;padding:26px 14px;border-width:1.5px}
+  .lvl2 .node .n-title{font-size:30px}
+  .lvl2 .node .n-sub{
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:16px;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    color:var(--muted-2);
+    margin-top:10px;
+    font-weight:600;
+  }
+
+  .connector{
+    display:block;
+    height:64px;
+    position:relative;
+  }
+  .connector svg{position:absolute;inset:0;width:100%;height:100%}
+
+  .bracket{
+    position:relative;
+    border:1.5px dashed var(--muted-2);
+    padding:36px 22px 22px;
+    margin-top:28px;
+  }
+  .bracket-label{
+    position:absolute;
+    top:-14px;left:28px;
+    background:#fff;
+    padding:0 16px;
+    font-family:"Inter",sans-serif;
+    font-size:17px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:700;
+    white-space:nowrap;
+  }
+</style>
+</head>
+<body>
+
+<div id="capture">
+  <div class="rule-top">
+    <h1 class="title">Thread áttekintés</h1>
+    <div class="kicker">Szerkezet és prompt‑tipológia</div>
+  </div>
+
+  <div class="a-counts">
+    <div class="count-cell">
+      <div class="count-num">1</div>
+      <div class="count-label">Általános<br/>prompt</div>
+    </div>
+    <div class="count-cell">
+      <div class="count-num">4</div>
+      <div class="count-label">Megkötéses<br/>prompt</div>
+    </div>
+    <div class="count-cell">
+      <div class="count-num">1</div>
+      <div class="count-label">Összehasonlító<br/>prompt</div>
+    </div>
+    <div class="count-cell">
+      <div class="count-num">6</div>
+      <div class="count-label">Összes prompt<br/>/ thread</div>
+    </div>
+  </div>
+
+  <div class="lvl1">
+    <div class="node">
+      <div class="n-tag">I · kiinduló</div>
+      <div class="n-title">Általános prompt</div>
+    </div>
+  </div>
+
+  <div class="connector">
+    <svg viewBox="0 0 400 64" preserveAspectRatio="none">
+      <line x1="200" y1="0" x2="200" y2="24" stroke="#111418" stroke-width="2"/>
+      <line x1="50"  y1="24" x2="350" y2="24" stroke="#111418" stroke-width="2"/>
+      <line x1="50"  y1="24" x2="50"  y2="54" stroke="#111418" stroke-width="2"/>
+      <line x1="150" y1="24" x2="150" y2="54" stroke="#111418" stroke-width="2"/>
+      <line x1="250" y1="24" x2="250" y2="54" stroke="#111418" stroke-width="2"/>
+      <line x1="350" y1="24" x2="350" y2="54" stroke="#111418" stroke-width="2"/>
+      <polygon points="50,64 43,52 57,52" fill="#111418"/>
+      <polygon points="150,64 143,52 157,52" fill="#111418"/>
+      <polygon points="250,64 243,52 257,52" fill="#111418"/>
+      <polygon points="350,64 343,52 357,52" fill="#111418"/>
+    </svg>
+  </div>
+
+  <div class="bracket">
+    <span class="bracket-label">II · megkötéses · azonos tematikus kategória</span>
+    <div class="lvl2">
+      <div class="node"><div class="n-title">1. szezon</div><div class="n-sub">Nyár</div></div>
+      <div class="node"><div class="n-title">2. szezon</div><div class="n-sub">Ősz</div></div>
+      <div class="node"><div class="n-title">3. szezon</div><div class="n-sub">Tél</div></div>
+      <div class="node"><div class="n-title">4. szezon</div><div class="n-sub">Tavasz</div></div>
+    </div>
+  </div>
+
+  <div class="connector">
+    <svg viewBox="0 0 400 64" preserveAspectRatio="none">
+      <line x1="50"  y1="0" x2="50"  y2="20" stroke="#111418" stroke-width="2"/>
+      <line x1="150" y1="0" x2="150" y2="20" stroke="#111418" stroke-width="2"/>
+      <line x1="250" y1="0" x2="250" y2="20" stroke="#111418" stroke-width="2"/>
+      <line x1="350" y1="0" x2="350" y2="20" stroke="#111418" stroke-width="2"/>
+      <line x1="50"  y1="20" x2="350" y2="20" stroke="#111418" stroke-width="2"/>
+      <line x1="200" y1="20" x2="200" y2="54" stroke="#111418" stroke-width="2"/>
+      <polygon points="200,64 193,52 207,52" fill="#111418"/>
+    </svg>
+  </div>
+
+  <div class="lvl1">
+    <div class="node">
+      <div class="n-tag">III · záró</div>
+      <div class="n-title">Összehasonlító prompt</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8" />
+<title>1.2 ábra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#111418;
+    --muted:#5b6470;
+    --muted-2:#8a929c;
+    --rule:#c9ced4;
+    --rule-soft:#e4e7ea;
+    --tint:#f3f4f2;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#fff;color:var(--ink);font-family:"Source Serif 4", Georgia, serif;}
+  #capture{
+    width:1600px;
+    padding:80px 90px 80px;
+    background:#fff;
+  }
+  .kicker{
+    font-family:"Inter",sans-serif;
+    font-size:20px;
+    letter-spacing:.28em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:600;
+    text-align:center;
+    margin:0 0 56px;
+  }
+  .rule-top{border-top:2.5px solid var(--ink); padding-top:44px;}
+
+  .thread-rail{ position:relative; }
+  .row{
+    display:flex;
+    align-items:stretch;
+    gap:0;
+    margin-bottom:26px;
+  }
+  .row .gutter{
+    flex:0 0 150px;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    padding-top:30px;
+  }
+  .row .gutter::before{
+    content:"";
+    position:absolute;
+    left:50%; top:0; bottom:-26px;
+    width:1.5px; background:var(--rule);
+    transform:translateX(-0.75px);
+  }
+  .row:last-child .gutter::before{ bottom:0; }
+  .row .gutter .num{
+    position:relative;z-index:1;background:#fff;padding:4px 12px;
+    font-family:"Source Serif 4",serif;
+    font-size:64px; font-weight:700;
+    color:var(--ink);line-height:1;
+  }
+  .row .gutter .lbl{
+    position:relative;z-index:1;background:#fff;
+    margin-top:10px;padding:0 10px;
+    font-family:"Inter",sans-serif;
+    font-size:16px;
+    letter-spacing:.24em;text-transform:uppercase;
+    color:var(--muted);font-weight:700;
+  }
+  .row .connector{
+    flex:0 0 40px;position:relative;
+  }
+  .row .connector::before{
+    content:"";
+    position:absolute;
+    left:0; right:0; top:60px;
+    height:1.5px; background:var(--rule);
+  }
+
+  .msg{
+    flex:1 1 auto;position:relative;
+    border:2px solid var(--ink);
+    background:#fff;
+    padding:30px 36px 30px;
+  }
+  .msg.constraint{ border-color:var(--muted); border-width:1.5px; }
+  .msg.compare{ border-color:var(--ink); background:var(--tint); border-width:2px; }
+
+  .msg-head{
+    display:flex;justify-content:space-between;align-items:baseline;gap:24px;
+    border-bottom:1.25px solid var(--rule-soft);
+    padding-bottom:18px;margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  .msg-label{
+    font-family:"Inter",sans-serif;
+    font-size:19px;
+    letter-spacing:.26em;
+    text-transform:uppercase;
+    color:var(--ink);font-weight:700;
+  }
+  .msg-sub{
+    font-family:"Source Serif 4",serif;
+    font-style:italic;
+    font-size:22px;
+    color:var(--muted);
+  }
+  .msg-body{
+    font-family:"Source Serif 4",serif;
+    font-size:26px;
+    line-height:1.5;
+    color:var(--ink);
+    text-wrap:pretty;
+  }
+  .msg-body .var{
+    font-family:"JetBrains Mono",monospace;
+    font-size:22px;
+    background:#f3f3ee;
+    padding:3px 10px;
+    border-radius:2px;
+    color:#2a2f36;
+    white-space:nowrap;
+  }
+
+  .seasonal-marker{
+    display:flex;align-items:center;
+    margin:20px 0 20px 0;
+  }
+  .seasonal-marker .spacer{ flex:0 0 150px; position:relative; }
+  .seasonal-marker .spacer::before{
+    content:"";position:absolute;
+    left:50%; top:-20px; bottom:-20px;
+    width:1.5px; background:var(--rule);
+    transform:translateX(-0.75px);
+  }
+  .seasonal-marker .gap{ flex:0 0 40px; }
+  .seasonal-label{
+    flex:1 1 auto;
+    font-family:"Inter",sans-serif;
+    font-size:17px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--muted);font-weight:700;
+    border-top:1.5px solid var(--rule);
+    padding:20px 0 0 0;
+  }
+</style>
+</head>
+<body>
+
+<div id="capture">
+  <div class="rule-top">
+    <div class="kicker">Beszélgetési szál · 6 egymásra épülő prompt</div>
+  </div>
+
+  <div class="thread-rail">
+
+    <div class="row">
+      <div class="gutter"><span class="num">1</span><span class="lbl">prompt</span></div>
+      <div class="connector"></div>
+      <div class="msg">
+        <div class="msg-head">
+          <div class="msg-label">Általános prompt</div>
+          <div class="msg-sub">Profilalapú kiinduló prompt</div>
+        </div>
+        <div class="msg-body">
+          “I am a <span class="var">[AGE: 25]</span>-year-old <span class="var">[GENDER: Male]</span>, and I would like to travel
+          <span class="var">[TRAVEL PARTY: with my partner]</span> for <span class="var">[LENGTH OF STAY: 3 nights]</span> to
+          <span class="var">[DESTINATION: Lake Balaton]</span>. Could you recommend activities in the area for us within a budget of
+          <span class="var">[BUDGET: max. 100 EUR per day per person]</span>?”
+        </div>
+      </div>
+    </div>
+
+    <div class="seasonal-marker">
+      <div class="spacer"></div>
+      <div class="gap"></div>
+      <div class="seasonal-label">Négy szezonális megkötés · azonos tematikai kategória (Wellness)</div>
+    </div>
+
+    <div class="row">
+      <div class="gutter"><span class="num">2</span><span class="lbl">prompt</span></div>
+      <div class="connector"></div>
+      <div class="msg constraint">
+        <div class="msg-head">
+          <div class="msg-label">I. Megkötéses prompt</div>
+          <div class="msg-sub">Wellness / Nyár</div>
+        </div>
+        <div class="msg-body">
+          “I am particularly interested in massage salons, sauna world, relaxation, and spa hotels. Could you recommend 5 places in the area <b>between June and August</b>?”
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="gutter"><span class="num">3</span><span class="lbl">prompt</span></div>
+      <div class="connector"></div>
+      <div class="msg constraint">
+        <div class="msg-head">
+          <div class="msg-label">II. Megkötéses prompt</div>
+          <div class="msg-sub">Wellness / Ősz</div>
+        </div>
+        <div class="msg-body">
+          “I am particularly interested in massage salons, sauna world, relaxation, and spa hotels. Could you recommend 5 places in the area <b>between September and November</b>?”
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="gutter"><span class="num">4</span><span class="lbl">prompt</span></div>
+      <div class="connector"></div>
+      <div class="msg constraint">
+        <div class="msg-head">
+          <div class="msg-label">III. Megkötéses prompt</div>
+          <div class="msg-sub">Wellness / Tél</div>
+        </div>
+        <div class="msg-body">
+          “I am particularly interested in massage salons, sauna world, relaxation, and spa hotels. Could you recommend 5 places in the area <b>between December and February</b>?”
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="gutter"><span class="num">5</span><span class="lbl">prompt</span></div>
+      <div class="connector"></div>
+      <div class="msg constraint">
+        <div class="msg-head">
+          <div class="msg-label">IV. Megkötéses prompt</div>
+          <div class="msg-sub">Wellness / Tavasz</div>
+        </div>
+        <div class="msg-body">
+          “I am particularly interested in massage salons, sauna world, relaxation, and spa hotels. Could you recommend 5 places in the area <b>between March and May</b>?”
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="gutter"><span class="num">6</span><span class="lbl">prompt</span></div>
+      <div class="connector"></div>
+      <div class="msg compare">
+        <div class="msg-head">
+          <div class="msg-label">Összehasonlító prompt</div>
+          <div class="msg-sub">Desztinációk összehasonlítása azonos tematikai kategórián belül</div>
+        </div>
+        <div class="msg-body">
+          “Besides <span class="var">[DESTINATION: Lake Balaton]</span>, could you recommend five comparable lakeside destination regions in other European countries where the <span class="var">[THEMATIC GROUP: wellness]</span> offer is particularly strong and also fits my profile and budget?”
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

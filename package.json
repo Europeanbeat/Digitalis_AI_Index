@@ -1,10 +1,7 @@
 {
   "scripts": {
     "main": "node scripts/main.js",
-    "demo": "node scripts/demo_server.js",
-    "general": "node scripts/general_prompt.js",
-    "constraint": "node scripts/constraint_prompt.js",
-    "comparison": "node scripts/comparison_prompt.js"
+    "batch": "node scripts/model_batch.js"
   },
   "dependencies": {
     "dotenv": "^17.4.2",

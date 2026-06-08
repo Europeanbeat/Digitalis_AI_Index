@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <title>PwC Digitális AI Érettségi Index – átrendezett munkaverzió</title>
+  <style>
+    :root {
+      --ink:#111418;
+      --muted:#5b6470;
+      --rule:#d8dde2;
+      --tint:#f5f6f4;
+      --accent:#eef1f4;
+    }
+    * { box-sizing:border-box; }
+    html, body { margin:0; padding:0; background:#fff; color:var(--ink); }
+    body { font-family: Georgia, "Times New Roman", serif; }
+    .page { max-width: 1040px; margin: 0 auto; padding: 56px 56px 80px; }
+    .rule-top { border-top:2.5px solid var(--ink); padding-top:26px; margin-bottom:28px; }
+    .kicker { font-family: Arial, sans-serif; color:var(--muted); text-transform:uppercase; letter-spacing:.2em; font-size:12px; font-weight:700; margin:0 0 10px; }
+    h1 { font-size:34px; line-height:1.12; margin:0 0 12px; }
+    h2 { font-size:28px; margin:34px 0 16px; }
+    h3 { font-size:22px; margin:26px 0 14px; }
+    h4 { font-size:18px; margin:22px 0 10px; }
+    p, li { font-size:17px; line-height:1.62; }
+    ul { margin: 8px 0 18px 22px; }
+    .lead { font-size:18px; line-height:1.58; margin:0 0 24px; }
+    .note { background:var(--tint); border:1px solid var(--rule); padding:16px 18px; margin:18px 0 24px; }
+    .move { background:#fafafa; border:1px solid var(--rule); padding:16px 18px; margin:18px 0 24px; }
+    .move p { margin:0 0 8px; }
+    .small { font-size:15px; color:var(--muted); }
+    .toc p { margin:4px 0; }
+    table { width:100%; border-collapse:collapse; margin:18px 0 24px; table-layout:fixed; }
+    th, td { border:1px solid var(--rule); padding:12px 12px; vertical-align:top; text-align:left; }
+    th { background:var(--accent); font-family:Arial, sans-serif; font-size:12px; text-transform:uppercase; letter-spacing:.12em; }
+    .figure { margin:18px 0 28px; }
+    .figure img { width:100%; height:auto; border:1px solid var(--rule); }
+    .figure .caption { font-size:15px; color:var(--muted); margin-top:8px; }
+    .appendix-note { font-size:15px; color:var(--muted); margin-top:-6px; margin-bottom:12px; }
+    .page-break { break-before: page; page-break-before: always; }
+    del { color:#7b828c; }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="rule-top">
+      <p class="kicker">Átrendezett munkaverzió</p>
+      <h1>PwC Digitális AI Érettségi Index</h1>
+      <p class="lead">Ez egy szerkezetileg átrendezett változat a jelenlegi <span class="small">.docx</span> alapján. A fő cél most nem a teljes újraírás, hanem annak megmutatása, hogy a jelenlegi tartalmak hova kerüljenek a dokumentumban.</p>
+    </div>
+
+    <div class="move">
+      <p><strong>Legfontosabb áthelyezés:</strong></p>
+      <p><del>Melléklet C : Kérdések</del> → <strong>2.1.1. Kutatási kérdések</strong></p>
+      <p class="small">A többi mellékleti blokk most a végén marad, csak a kérdésblokk került vissza a főszövegbe.</p>
+    </div>
+
+    <h2>Tartalomjegyzék</h2>
+    <div class="toc">
+      <p>Bevezetés</p>
+      <p>1. AI-alapú desztinációs láthatóság (AI visibility) értelmezése és mérési megközelítései</p>
+      <p>2. Methodology – AI-alapú desztinációs láthatóság (AI Visibility) mérése és benchmarking keretrendszer</p>
+      <p>2.1. Kutatási megközelítés és célrendszer</p>
+      <p>2.1.1. Kutatási kérdések</p>
+      <p>2.2. Módszertani keret és kutatási design</p>
+      <p>2.3. Adatgyűjtési volumen és modellek</p>
+      <p>2.4. Adatkinyerés és strukturálás</p>
+      <p>2.5. AI Visibility Score – mérési és értékelési modell</p>
+      <p>2.5.1. A scoring modell dimenziói</p>
+      <p>2.5.2. Aggregáció és súlyozás</p>
+      <p>2.5.3. Interpretációs keret</p>
+      <p>2.5.4. A modell szerepe a döntéstámogatásban</p>
+      <p>2.6. Benchmarking és összehasonlító elemzés</p>
+      <p>2.7. Döntéstámogatás és beavatkozási lehetőségek</p>
+      <p>2.8. Reprodukálhatóság és alkalmazhatóság</p>
+      <p>3. Prompt-alapú adatgyűjtési keret</p>
+      <p>3.1. Keretrendszer</p>
+      <p>3.2. Profilalapú beszélgetési lánc</p>
+      <p>3.2.1. Általános prompt</p>
+      <p>3.2.2. Megkötéses promptok</p>
+      <p>3.2.3. Összehasonlító prompt</p>
+      <p>3.3. Felfedező (EU Desztinációs) promptok</p>
+      <p>3.4. Ábrák</p>
+      <p>Melléklet A. Profil variánsok</p>
+      <p>Melléklet B. Desztináció tematikus termékcsoportok</p>
+      <p>Melléklet C. Profilok</p>
+      <p>Melléklet D. Adatbázis struktúra ábrája</p>
+      <p>Irodalom</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>Bevezetés</h2>
+
+    <h2>1. AI-alapú desztinációs láthatóság (AI visibility) értelmezése és mérési megközelítései</h2>
+    <p>A turisztikai desztinációk láthatósága az elmúlt évtizedben alapvetően átalakult: a klasszikus információforrások (DMO-k, keresőmotorok, UGC-platformok) mellé beléptek a generatív mesterséges intelligencián alapuló rendszerek, amelyek nemcsak közvetítik, hanem aktívan szűrik, aggregálják és újrarendezik a desztinációkról szóló információkat. A nagy nyelvi modellek (LLM-ek) így új típusú „láthatósági réteget” hoznak létre, amelyben a felhasználók már nem több forrásból építik fel a mentális képet, hanem egyetlen, szintetizált válaszból. Ennek következtében ezek a rendszerek a turisztikai információs ökoszisztémában kapuőrként (gatekeeper) működnek, és képesek strukturális hatást gyakorolni arra, hogy mely desztinációk kerülnek a döntési térbe .</p>
+<p>A szakirodalom alapján az AI-alapú ajánlórendszerek nem semleges közvetítők. A generált válaszok mögött húzódó tanulási mechanizmusok és adatkészletek következtében a modellek hajlamosak a meglévő turisztikai struktúrák reprodukálására és felerősítésére, különösen a jól ismert, erősen reprezentált desztinációk irányába . Ez a jelenség a desztinációk láthatóságát nemcsak mennyiségi (megjelenések száma), hanem szerkezeti értelemben is befolyásolja: az AI által generált térkép sok esetben koncentráltabb és kevésbé diverz, mint a felhasználók által generált tartalmakon alapuló reprezentáció.</p>
+<p>Ebből kiindulva az AI visibility olyan komplex konstrukcióként értelmezhető, amely három egymással összefüggő dimenzió mentén ragadható meg. Egyrészt expozícióként, amely arra utal, hogy egy adott desztináció milyen gyakorisággal jelenik meg AI-alapú válaszokban. Másrészt reprezentációként, amely a megjelenés minőségét, kontextusát és narratív kereteit írja le. Harmadrészt pedig eloszlásként, amely azt mutatja meg, hogy az AI által generált ajánlások milyen térbeli és tematikus struktúrában helyezik el a desztinációt a versenytársak között. Ez a hármas megközelítés összhangban áll a turisztikai desztinációk képének (destination image) klasszikus kognitív–affektív–konatív modelljével, amely szerint a desztinációk percepciója információs, érzelmi és viselkedési komponensek mentén épül fel.</p>
+<p>Az AI visibility mérésének egyik meghatározó módszertani iránya az úgynevezett audit-alapú megközelítés. Ennek lényege, hogy standardizált kérdések (promptok) segítségével generálnak válaszokat különböző modellekből, majd azokat strukturált adatokká alakítják és kvantitatív módon elemzik. Az ilyen típusú kutatások tipikusan persona-alapú kísérleti design-t alkalmaznak, amely lehetővé teszi annak vizsgálatát, hogy az AI hogyan differenciál különböző felhasználói profilok között . Ez különösen fontos, mivel az AI-alapú láthatóság nem univerzális, hanem erősen kontextusfüggő: ugyanaz a desztináció eltérő mértékben jelenhet meg különböző célcsoportok számára.</p>
+<p>A láthatóság egyik kulcseleme a popularitás-alapú torzítás. Az LLM-ek által generált ajánlások gyakran koncentrálódnak a globálisan ismert desztinációkra, miközben az úgynevezett „long tail” – a kevésbé ismert, de releváns helyszínek – alulreprezentáltak maradnak . Ez nemcsak a láthatóság torzulásához vezet, hanem hosszabb távon a turisztikai kereslet térbeli koncentrációját is erősítheti, ami a túlterheltség (overtourism) és a periférikus területek marginalizációja szempontjából kritikus kérdés. A jelenség különösen jól megfigyelhető olyan összehasonlító vizsgálatokban, ahol az AI által ajánlott helyszíneket valós turistamozgásokkal vetik össze: az eredmények szerint az AI által generált listák szignifikánsan kevesebb és erősebben koncentrált desztinációt tartalmaznak.</p>
+<p>A láthatóság minőségi dimenzióját a reprezentáció vizsgálata ragadja meg. A generatív modellek által előállított desztinációleírások gyakran erősen promóciós jellegűek, és klisés nyelvezetet alkalmaznak, amely homogenizálja a különböző helyszíneket . Ez a jelenség azt eredményezi, hogy a desztinációk közötti különbségek elmosódnak, és a felhasználók számára egy leegyszerűsített, „standardizált” turisztikai kép jelenik meg. A reprezentáció tehát nemcsak azt határozza meg, hogy egy desztináció megjelenik-e, hanem azt is, hogy milyen pozícióban és milyen jelentéstartalommal jelenik meg az AI által generált diskurzusban.</p>
+<p>A harmadik dimenzió, az eloszlás, elsősorban térbeli és strukturális szempontból értelmezhető. A kutatások azt mutatják, hogy az AI-alapú ajánlások gyakran szűkebb földrajzi portfóliót kínálnak, mint a felhasználók által generált tartalmak, ami a desztinációk közötti verseny újrastrukturálódásához vezethet. Ez a hatás különösen releváns a kisebb vagy kevésbé ismert desztinációk esetében, amelyek számára az AI visibility kritikus tényezővé válhat a nemzetközi turisztikai versenyben.</p>
+<p>Az AI visibility értelmezésében fontos szerepet játszik a felhasználók által generált tartalom (UGC) is, amely hagyományosan a desztinációk „észlelt képének” egyik legfontosabb forrása. Az online értékelések, közösségi médiás bejegyzések és egyéb digitális nyomok lehetővé teszik a kutatók számára, hogy nagyméretű adathalmazok alapján vizsgálják a desztinációk percepcióját és megítélését. Az AI által generált tartalmak és az UGC összevetése így kulcsfontosságú módszertani eszközzé válik, amely lehetővé teszi a láthatóság torzulásainak azonosítását és értelmezését.</p>
+<p>Összességében az AI-alapú desztinációs láthatóság egy többdimenziós, dinamikus jelenség, amely az expozíció, a reprezentáció és az eloszlás együttes vizsgálatával ragadható meg. A jelenlegi szakirodalom egyértelműen rámutat arra, hogy a generatív AI rendszerek nem csupán új információs csatornát jelentenek, hanem a turisztikai döntéshozatal strukturális alakítóivá válnak. Ennek megfelelően a desztinációk versenyképességének értelmezésében és mérésében az AI visibility egyre inkább meghatározó tényezővé válik, amely új megközelítéseket és mérési keretrendszereket igényel.</p>
+
+    <h2>2. Methodology – AI-alapú desztinációs láthatóság (AI Visibility) mérése és benchmarking keretrendszer</h2>
+
+    <h3>2.1. Kutatási megközelítés és célrendszer</h3>
+    <p>A jelen kutatás célja egy olyan, mesterséges intelligencia által közvetített desztinációs láthatósági (AI Visibility) mérési és értékelési keretrendszer kialakítása, amely a Balaton turisztikai pozícióját képes objektív, kvantitatív módon meghatározni, valamint összehasonlíthatóvá teszi azt releváns európai versenytárs desztinációkkal. A megközelítés alapfeltevése, hogy a nagy nyelvi modellek (LLM-ek) – mint például a generatív AI-alapú chatbotok – egyre meghatározóbb szerepet töltenek be az utazási döntéshozatalban, és aktív módon alakítják a desztinációk láthatóságát azáltal, hogy strukturált, szintetizált ajánlásokat nyújtanak a felhasználóknak .</p>
+<p>A módszertan kialakításakor kiemelt szempont volt, hogy az eredmények ne csupán leíró jellegűek legyenek, hanem reprodukálhatók, összehasonlíthatók és közvetlenül döntéstámogatásra alkalmasak. Ennek megfelelően a keretrendszer nem kizárólag egy mérési logikát, hanem egy olyan strukturált elemzési megközelítést kínál, amely a desztinációk AI-alapú láthatóságának értelmezését és fejlesztését is lehetővé teszi.</p>
+
+    <h3>2.1.1. Kutatási kérdések</h3>
+    <p class="appendix-note">Ez a blokk a korábbi <strong>Melléklet C</strong> helyéről került vissza a főszövegbe.</p>
+    <ul>
+<li>Egyáltalán megjelenik Balaton más tóparti versenytárs mellet az MI-ajánlásokban?</li>
+<li>Milyen gyakorisággal említik Balatont az MI rendszerek versenytársak mellet ?</li>
+<li>Mely úticélok jelennek meg leggyakrabban együtt a mesterséges intelligencia ajánlásban?</li>
+<li>Milyen hatással vannak tematikus csoportok az MI  ajánlásaira és a Balatonak versenytársaira ?</li>
+<li>Melyik a leggyakrabban megjelenő  Balatoni desztinációs  jellemzők?</li>
+<li>Mennyire egységesek a különböző mesterséges intelligencia modellek a desztináció jellemzőinek megítélésében?</li>
+<li>Mely tó régióban lévő motivációs csoportok bírnak a legnagyobb piaci relevanciával és milyen versenyelőnyt élveznek a mesterséges intelligencia modellek konszenzusa alapján</li>
+<li>Mely motivációs csoportok bírnak a legnagyobb piaci relevanciával és milyen versenyelőnyt élveznek a mesterséges intelligencia modellek konszenzusa alapján?</li>
+<li>Hol marad el  Balaton a versenytársaktól?</li>
+<li>Hol tartart  előrébb?</li>
+<li>Mennyire jól ragadják meg a mesterséges intelligencia modellek a destináció stratégiai identitását?</li>
+<li>Ajánl-e olyan helyet/ vagy programot ami nem létező ?</li>
+</ul>
+
+    <h3>2.2. Módszertani keret és kutatási design</h3>
+    <p>A kutatás egy strukturált, audit-alapú megközelítést alkalmaz, amely kontrollált természetes nyelvi lekérdezéseken keresztül vizsgálja a generatív mesterséges intelligencia rendszerek (LLM-ek) válaszstruktúráit és ajánlási mintázatait. Az audit-alapú design célja, hogy a valós felhasználói interakciókat modellezve, de standardizált körülmények között tegye mérhetővé az AI által közvetített desztinációs láthatóságot. Ez a megközelítés lehetővé teszi az AI-ajánlások szisztematikus feltérképezését, valamint a különböző modellek, piacok és desztinációk közötti konzisztens és reprodukálható összehasonlítást .</p>
+<p>A módszertani keret kialakítása során kiemelt szempont volt, hogy a vizsgálat ne egyedi lekérdezésekre vagy eseti eredményekre épüljön, hanem egy olyan szabályozott kísérleti környezetet hozzon létre, amelyben az AI rendszerek viselkedése mérhető és értelmezhető. Ennek megfelelően a kutatás nem egyszeri adatgyűjtést, hanem egy ismételhető mérési protokollt alkalmaz, amely lehetővé teszi az időbeli és földrajzi összehasonlításokat is.</p>
+<p>A teljes mérési folyamat négy egymásra épülő, logikailag elkülönülő fázisból áll:</p>
+<p>(1) Standardizált prompt-alapú adatgyűjtés. Ebben a fázisban a desztinációk láthatóságát természetes nyelvi lekérdezéseken keresztül mérjük. A lekérdezések előre definiált, strukturált prompt-keretrendszer alapján kerülnek kialakításra, amely biztosítja az inputok egységességét. A cél nem az egyedi válaszok elemzése, hanem az AI rendszerek válaszmintázatainak aggregált vizsgálata.</p>
+<p>(2) Strukturált adatkinyerés és feldolgozás. A generált válaszok strukturálatlan szöveges formából strukturált adattá kerülnek átalakításra. Ez a lépés biztosítja, hogy a desztinációk megjelenése, rangsora, kontextusa és kapcsolatai kvantitatív módon elemezhetők legyenek. A feldolgozás során külön figyelmet kap az entitások egységesítése és a torzító tényezők kiszűrése.</p>
+<p>(3) AI Visibility Score számítás. A strukturált adatok alapján egy többdimenziós scoring modell kerül alkalmazásra, amely a desztinációk láthatóságát nemcsak gyakoriság, hanem pozíció, tematikus lefedettség és versenytársi kontextus mentén is értékeli. Ez a fázis biztosítja a mérés kvantitatív, összehasonlítható outputját.</p>
+<p>(4) Benchmarking és stratégiai értelmezés. A score-ok és az azok mögött álló mintázatok összehasonlítása történik a kiválasztott versenytárs desztinációkkal. Az elemzés célja nem csupán a rangsorolás, hanem a relatív pozíciók, strukturális különbségek és láthatósági hiányterületek azonosítása, amelyek alapot adnak a későbbi stratégiai beavatkozásokhoz.</p>
+<p>A módszertan egyik legfontosabb alapelve a kontrollált kísérleti környezet biztosítása. Ennek érdekében minden lekérdezés izolált interakciós környezetben (külön sessionben vagy threadben) kerül végrehajtásra. Ez kritikus jelentőségű, mivel a generatív AI modellek válaszai erősen függnek az előzményektől és a kontextustól. Az izoláció biztosítja, hogy az egyes lekérdezések egymástól függetlenek legyenek, és az eredmények ne torzuljanak korábbi interakciók hatására.</p>
+<p>Ezen túlmenően a design implicit módon kezeli az AI rendszerek működéséből fakadó torzításokat is. A szakirodalom rámutat arra, hogy az LLM-ek hajlamosak a már ismert, erősen reprezentált desztinációk felülreprezentálására és a láthatóság koncentrálására . A standardizált, többdimenziós lekérdezési struktúra és a benchmarking beépítése ezért kulcsfontosságú a torzítások azonosítása és értelmezése szempontjából.</p>
+
+    <h3>2.3. Adatgyűjtési volumen és modellek</h3>
+    <p>A mérési keretrendszer egyik meghatározó eleme a megfelelő adatgyűjtési volumen biztosítása, amely alapfeltétele az eredmények megbízhatóságának és érvényességének. A generatív AI rendszerek működéséből fakadóan az egyedi válaszok jelentős variabilitást mutathatnak, ezért a vizsgálat nem egyedi outputokra, hanem nagy elemszámú, strukturált mintára épül. Ennek megfelelően a kutatás célja egy olyan lekérdezési volumen kialakítása, amely képes az egyedi válaszokból eredő zajt kisimítani, és feltárni az AI rendszerek mögöttes ajánlási logikáját és mintázatait.</p>
+<p>Az adatgyűjtés volumene a lekérdezések többdimenziós felépítéséből adódik. A lekérdezések különböző utazói profilok, motivációs kontextusok, szezonális paraméterek és lekérdezési típusok kombinációjaként kerülnek generálásra. Ez a kombinatorikus megközelítés lehetővé teszi, hogy a mérés lefedje a valós felhasználói keresési viselkedés széles spektrumát, miközben biztosítja az inputok standardizáltságát és az eredmények összehasonlíthatóságát. A kialakított struktúra így nem egyedi válaszokra, hanem aggregált válaszeloszlásokra épít, amely a generatív AI-alapú láthatóság mérésének alapvető követelménye.</p>
+<p>A lekérdezési volumen nagyságrendileg több száz vagy ezer promptot jelent egy adott desztináció és piac vizsgálata során. Ez a volumen elegendő ahhoz, hogy statisztikailag értelmezhető mintázatok rajzolódjanak ki, valamint hogy az egyes profilok és kontextusok közötti eltérések megbízhatóan azonosíthatók legyenek. A nagy elemszám biztosítja, hogy az eredmények ne egyedi válaszokból, hanem stabil trendekből és visszatérő mintákból származzanak.</p>
+<p>A kutatás során több generatív AI modell párhuzamos alkalmazása történik. A modell-diverzifikáció célja, hogy az egyes rendszerek sajátosságaiból eredő torzítások kezelhetők legyenek. A különböző modellek eltérő tréningadatokra, architektúrára és optimalizációs logikára épülnek, ami különböző ajánlási mintázatokat eredményezhet. A több modell együttes vizsgálata lehetővé teszi egy konszenzus-alapú láthatósági kép kialakítását, amely jobban tükrözi az AI-ökoszisztéma egészének működését, mint egyetlen rendszer elemzése.</p>
+<p>A modellek kiválasztása során elsődleges szempont a piaci relevancia és a széles körű felhasználás volt, így a vizsgálat a legelterjedtebb generatív AI rendszerekre fókuszál. A lekérdezések minden modell esetében azonos prompt-struktúra mentén kerülnek végrehajtásra, biztosítva a módszertani konzisztenciát. Ez lehetővé teszi a modellek közötti különbségek feltárását, valamint az ajánlások közötti konzisztencia mérését, amely önmagában is fontos indikátora a desztinációk AI-alapú láthatóságának.</p>
+<p>A nyelvi dimenzió külön kezelést kap az adatgyűjtés során. A lekérdezések több nyelven kerülnek végrehajtásra, különös tekintettel a Balaton fő küldőpiacaira. Ez a megközelítés lehetővé teszi annak vizsgálatát, hogy az AI rendszerek hogyan differenciálják a desztinációkat különböző nyelvi és kulturális kontextusokban. A többnyelvű adatgyűjtés hozzájárul a rejtett torzítások feltárásához, és pontosabb képet ad a desztináció nemzetközi láthatóságáról.</p>
+<p>Az adatgyűjtési volumen és a modellek diverzifikált alkalmazása együttesen biztosítja, hogy a mérés stabil, aggregált és összehasonlítható adathalmazra épüljön, amely alkalmas a későbbi scoring modell megbízható működtetésére és a benchmarking elemzések validálására.</p>
+
+    <h3>2.4. Adatkinyerés és strukturálás</h3>
+    <p>A generatív AI rendszerek által előállított válaszok elsődlegesen strukturálatlan, szabad szöveges formában állnak rendelkezésre, amelyek közvetlenül nem alkalmasak kvantitatív elemzésre. Ennek megfelelően a kutatás egyik kritikus lépése egy olyan adatkinyerési és strukturálási folyamat kialakítása, amely képes a nyers AI-outputokat egységes, elemzésre alkalmas adattá alakítani. A módszertan célja ebben a fázisban az, hogy a válaszok mögött meghúzódó láthatósági mintázatok objektíven mérhető és összehasonlítható formában jelenjenek meg.</p>
+<p>A feldolgozás egy több lépcsős pipeline mentén történik, amely ötvözi a természetes nyelvfeldolgozás (NLP) eszközeit és a szabályalapú adatellenőrzést. Az első lépésben a nyers válaszokból azonosításra kerülnek a releváns desztinációk és helyszínek. Ez az úgynevezett entitáskinyerési (Named Entity Recognition) folyamat lehetővé teszi, hogy a szöveges tartalomból strukturált módon kerüljenek kiemelésre a turisztikai helyszínek, amelyek később az elemzés alapját képezik. A szakirodalom alapján az ilyen típusú információkinyerési módszerek hatékonyan alkalmazhatók turisztikai szövegek feldolgozásában, különösen nagy volumenű adathalmazok esetén .</p>
+<p>Az entitások kinyerését követően történik azok normalizálása. Ez a lépés biztosítja, hogy az eltérő elnevezések – például „Balaton”, „Lake Balaton” vagy „Hungarian Sea” – egységes azonosító alá kerüljenek. A normalizálás elengedhetetlen az összehasonlíthatóság szempontjából, mivel az AI rendszerek gyakran többféle megnevezést használnak ugyanarra a desztinációra. A folyamat során szabályalapú és szótár-alapú egyeztetés, valamint manuális validáció kombinációja kerül alkalmazásra a pontosság biztosítása érdekében.</p>
+<p>A következő lépés a rangsorinformációk strukturálása. Az AI által generált ajánlások tipikusan listák formájában jelennek meg, ahol a pozíció implicit módon jelzi az ajánlás relevanciáját. A módszertan minden egyes megjelenést egy rangsorpozícióhoz rendel, amely később súlyozott módon kerül beépítésre a scoring modellbe. Ez a lépés lehetővé teszi a puszta megjelenési gyakoriságon túl a desztinációk relatív láthatóságának értékelését is.</p>
+<p>A strukturálás során tematikus kategorizálás is történik. A desztinációkhoz kapcsolódó ajánlások különböző motivációs és élménydimenziók mentén kerülnek besorolásra, például wellness, gasztronómia, aktív turizmus vagy kulturális turizmus kategóriákba. Ez a lépés kulcsfontosságú a desztinációk USP (Unique Selling Proposition) profiljának feltárásában, és lehetővé teszi annak vizsgálatát, hogy az AI rendszerek milyen tematikus kontextusban jelenítik meg az adott desztinációt.</p>
+<p>Az adatfeldolgozás további eleme az együttemlítési mintázatok (co-occurrence) azonosítása. Ez azt vizsgálja, hogy egy adott desztináció milyen más helyszínekkel jelenik meg együtt az AI válaszokban. Az együttemlítések feltárása különösen fontos a versenytér megértéséhez, mivel az AI rendszerek által implicit módon létrehozott versenytársi struktúrát tükrözi. Ez a megközelítés lehetővé teszi a desztinációk relatív pozíciójának finomabb értelmezését, túlmutatva az egyszerű rangsorokon.</p>
+<p>A feldolgozási pipeline végén a strukturált adat egy egységes adatszerkezetben kerül tárolásra, amely minden releváns információt tartalmaz: desztináció, megjelenési gyakoriság, rangsorpozíció, tematikus besorolás, együttemlítések és – ahol releváns – a válasz kontextuális jellemzői. Ez az egységes struktúra biztosítja, hogy az adatok közvetlenül felhasználhatók legyenek a későbbi scoring és benchmarking elemzésekhez.</p>
+<p>A strukturálás során külön figyelmet kap az adattisztítás és validáció. A generatív AI rendszerek működéséből fakadóan előfordulhatnak pontatlanságok, például nem létező helyszínek vagy pontatlan ajánlások. Ezek kiszűrése érdekében a rendszer opcionálisan szabályalapú ellenőrzési mechanizmusokat és manuális validációs lépéseket is tartalmaz. Ez biztosítja, hogy a végső adatbázis megbízható és elemzésre alkalmas legyen.</p>
+<p>A kialakított adatkinyerési és strukturálási folyamat kulcsszerepet játszik abban, hogy a természetes nyelvi interakciókból származó információk kvantitatív, összehasonlítható és stratégiailag értelmezhető formába kerüljenek. Ez a lépés teremti meg az alapját az AI Visibility Score számításának, valamint a benchmarking és döntéstámogatási elemzéseknek.</p>
+
+    <h3>2.5. AI Visibility Score – mérési és értékelési modell</h3>
+    <p>A kutatás központi eleme az AI Visibility Score kialakítása, amely a desztinációk mesterséges intelligencia által közvetített láthatóságát egy egységes, kvantitatív keretrendszerben értelmezi. A modell célja, hogy a strukturált adatfeldolgozás eredményeit olyan aggregált mutatóvá alakítsa, amely alkalmas a desztinációk közötti összehasonlításra, valamint a stratégiai döntéshozatal támogatására.</p>
+<p>A scoring modell alapfeltevése, hogy a desztinációk AI-alapú láthatósága nem redukálható egyetlen dimenzióra, hanem több, egymással összefüggő tényező együttes hatásaként értelmezhető. Ennek megfelelően az AI Visibility Score egy többkomponensű index, amely a desztinációk megjelenési gyakoriságát, pozicionálását, tematikus lefedettségét és versenytársi kontextusát egyaránt figyelembe veszi.</p>
+
+    <h4>2.5.1. A scoring modell dimenziói</h4>
+    <p>A modell öt fő dimenzió mentén méri a láthatóságot.</p>
+<p>Az első dimenzió a megjelenési gyakoriság (mention share), amely azt méri, hogy az adott desztináció milyen arányban jelenik meg az AI által generált válaszokban az összes említéshez viszonyítva. Ez a mutató a láthatóság alapvető indikátora, és közvetlenül tükrözi a desztináció jelenlétét az AI által közvetített információs térben.</p>
+<p>A második dimenzió a rangsorpozíció (rank score), amely az ajánlási listákban elfoglalt helyezések súlyozott értékelésén alapul. Az AI rendszerek által generált válaszok esetében a listaelemek sorrendje implicit relevanciajelzést hordoz, így a magasabb pozíciók nagyobb súllyal kerülnek figyelembevételre. Ez a dimenzió lehetővé teszi a puszta megjelenési gyakoriságon túl a desztinációk relatív prioritásának mérését.</p>
+<p>A harmadik dimenzió a tematikus lefedettség (category coverage), amely azt vizsgálja, hogy a desztináció milyen mértékben jelenik meg különböző motivációs és élménykategóriákban. Ez a komponens különösen fontos a desztinációk USP-profiljának értelmezésében, mivel nemcsak a jelenlétet, hanem a relevancia sokszínűségét is méri.</p>
+<p>A negyedik dimenzió a kontextuális diverzitás (context diversity), amely azt méri, hogy a desztináció milyen változatos lekérdezési helyzetekben jelenik meg. Egy olyan desztináció, amely többféle profil, motiváció és szezonális kontextus esetén is megjelenik, stabilabb és erősebb AI-láthatósággal rendelkezik, mint egy szűk kontextusban releváns helyszín.</p>
+<p>Az ötödik dimenzió a versenytársi együttmegjelenés (competitive presence), amely azt vizsgálja, hogy a desztináció milyen más helyszínekkel együtt jelenik meg az AI válaszokban. Ez a dimenzió lehetővé teszi a desztináció relatív pozíciójának meghatározását az AI által implicit módon létrehozott versenytérben.</p>
+
+    <h4>2.5.2. Aggregáció és súlyozás</h4>
+    <p>Az AI Visibility Score a fenti dimenziók súlyozott aggregációján alapul. A súlyok meghatározása a kutatás stratégiai fókuszától függően történik, lehetővé téve a modell testreszabását különböző elemzési célokra. Például egy piaci láthatóságot hangsúlyozó elemzés esetében a megjelenési gyakoriság nagyobb súlyt kaphat, míg egy pozicionálási vizsgálat során a rangsorpozíció és a tematikus lefedettség kerülhet előtérbe.</p>
+<p>A különböző dimenziók eltérő mértékegysége és skálája miatt minden komponens normalizálásra kerül egy egységes, jellemzően 0–100 közötti skálára. Ez biztosítja, hogy a különböző dimenziók összehasonlíthatók legyenek, és egyik komponens se dominálja aránytalanul a végső score-t.</p>
+<p>Az aggregáció során a modell nemcsak egy végső értéket generál, hanem egy részletes, dimenziónkénti bontást is, amely lehetővé teszi a desztináció láthatósági profiljának mélyebb elemzését.</p>
+
+    <h4>2.5.3. Interpretációs keret</h4>
+    <p>Az AI Visibility Score értelmezése nem kizárólag abszolút értékek mentén történik, hanem elsősorban relatív összehasonlításban nyer jelentést. Egy adott desztináció score-ja önmagában korlátozott információt hordoz, azonban a versenytársakkal összevetve egyértelműen kirajzolódik a relatív erősség vagy gyengeség.</p>
+<p>A score értelmezése során három alapvető szempont kerül figyelembevételre:</p>
+<p>a desztináció relatív pozíciója a versenytérben,</p>
+<p>a különböző dimenziók közötti egyensúly vagy torzulás,</p>
+<p>valamint a láthatóság szerkezeti mintázata (pl. koncentráció vagy diverzitás).</p>
+<p>A szakirodalom rámutat arra, hogy az AI rendszerek hajlamosak a mainstream desztinációk felülreprezentálására és a láthatóság koncentrálására . Ennek megfelelően a magas score nem feltétlenül jelent kiegyensúlyozott láthatóságot, hanem akár túlzott koncentrációt is jelezhet, amely stratégiai kockázatokat hordozhat.</p>
+
+    <h4>2.5.4. A modell szerepe a döntéstámogatásban</h4>
+    <p>A scoring modell nem csupán mérési eszközként szolgál, hanem a stratégiai elemzés alapját is képezi. A dimenziónkénti bontás lehetővé teszi a láthatósági hiányterületek azonosítását, valamint a versenytársakkal szembeni eltérések feltárását.</p>
+<p>A modell eredményei alapján azonosíthatók például:</p>
+<p>alulreprezentált tematikus területek,</p>
+<p>gyenge rangsorpozíciók,</p>
+<p>szűk kontextuális jelenlét,</p>
+<p>vagy kedvezőtlen versenytársi együttmegjelenések.</p>
+<p>Ezáltal a scoring rendszer közvetlenül támogatja a desztinációs pozicionálás és tartalomstratégia fejlesztését, valamint hozzájárul a mesterséges intelligencia által alakított információs térben való tudatos jelenlét kialakításához.</p>
+<p>A modell tehát nemcsak a jelenlegi állapot mérésére alkalmas, hanem a jövőbeni beavatkozások hatásának nyomon követésére is, lehetővé téve a desztinációk AI-alapú láthatóságának dinamikus monitorozását.</p>
+
+    <h3>2.6. Benchmarking és összehasonlító elemzés</h3>
+    <p>A benchmarking a módszertan szerves része, amely biztosítja, hogy a Balaton AI Visibility Score-ja ne önmagában, hanem releváns versenytárs desztinációk kontextusában kerüljön értelmezésre. A benchmarking két egymást kiegészítő megközelítésen alapul. Egyrészt az AI rendszerek által generált ajánlásokból azonosításra kerülnek az implicit versenytársak, vagyis azok a desztinációk, amelyek azonos kontextusban jelennek meg a Balatonnal. Másrészt előre definiált, stratégiailag releváns benchmark desztinációk (pl. Garda-tó, Bledi-tó, Como-tó) is bevonásra kerülnek az elemzésbe, biztosítva az összehasonlítás stabilitását.</p>
+<p>A benchmarking során az AI Visibility Score és annak komponensei minden vizsgált desztináció esetében azonos módszertan mentén kerülnek kiszámításra. Ez lehetővé teszi a relatív versenypozíció meghatározását, valamint a láthatósági mintázatok közötti különbségek feltárását. A megközelítés különös jelentőséggel bír, mivel a generatív AI rendszerek hajlamosak a jól ismert, domináns desztinációk felülreprezentálására, ami torzíthatja az abszolút értelmezést .</p>
+<p>Az összehasonlító elemzés nem kizárólag rangsorolásra irányul, hanem a desztinációk láthatósági profiljának feltárására. Ennek keretében vizsgálható a tematikus lefedettség, a rangsorpozíciók eloszlása, valamint a versenytársakkal való együttmegjelenési mintázatok. Az eredmények alapján kirajzolódik a Balaton relatív pozíciója az AI által konstruált turisztikai térben.</p>
+
+    <h3>2.7. Döntéstámogatás és beavatkozási lehetőségek</h3>
+    <p>A módszertan egyik legfontosabb célja, hogy a mérési eredmények közvetlenül felhasználhatók legyenek stratégiai döntéshozatal támogatására. Az AI Visibility Score és annak dimenziói lehetővé teszik a desztináció láthatósági hiányterületeinek és erősségeinek azonosítását, amely alapján konkrét beavatkozási irányok határozhatók meg.</p>
+<p>Az elemzés során különböző típusú „láthatósági gap”-ek azonosíthatók, például tematikus hiányok (pl. gyenge jelenlét egy adott motivációs dimenzióban), rangsorpozíciós lemaradás, vagy alacsony kontextuális diverzitás. Ezek a hiányok közvetlenül összekapcsolhatók tartalomfejlesztési, pozicionálási vagy kommunikációs beavatkozásokkal. Például egy alacsony tematikus lefedettség arra utalhat, hogy a desztináció adott USP-je nem jelenik meg kellő mértékben az AI rendszerekben, ami célzott tartalomstratégiai fejlesztést indokolhat.</p>
+<p>A szakirodalom alapján az AI rendszerek nem teljes képet, hanem egyfajta szűrt, reputáció-alapú reprezentációt nyújtanak, amely a domináns narratívákat erősíti . Ennek megfelelően a beavatkozások célja nem pusztán a láthatóság növelése, hanem annak tudatos formálása az AI által közvetített információs térben.</p>
+
+    <h3>2.8. Reprodukálhatóság és alkalmazhatóság</h3>
+    <p>A kialakított módszertani keret egyik meghatározó jellemzője a reprodukálhatóság, amely biztosítja, hogy a mérés időben ismételhető és különböző piacokon is alkalmazható legyen. A standardizált prompt-struktúra, az egységes adatfeldolgozási pipeline és a formalizált scoring modell együttesen garantálják, hogy az eredmények konzisztens módon előállíthatók legyenek.</p>
+<p>A megközelítés skálázható, így nemcsak a Balaton, hanem más desztinációk esetében is alkalmazható, valamint lehetőséget biztosít időbeli trendek vizsgálatára és a láthatóság változásának nyomon követésére. Ez különösen fontos egy olyan dinamikus környezetben, ahol az AI modellek folyamatosan fejlődnek, és az általuk generált ajánlások is változnak.</p>
+<p>A módszertan gyakorlati alkalmazhatósága abban rejlik, hogy egyszerre képes kvantitatív mérési alapot biztosítani és kvalitatív értelmezést támogatni. Ez lehetővé teszi, hogy a desztinációk ne csupán mérjék, hanem aktívan alakítsák is saját láthatóságukat az AI-alapú információs térben.</p>
+
+    <div class="page-break"></div>
+
+    <h2>3. Prompt-alapú adatgyűjtési keret</h2>
+
+    <h3>3.1. Keretrendszer</h3>
+    <p>Prompt gyüjtést keretrendszerét  Andreev és társaihoz (2025) hasonlóan három prompt típusból álló, összesen hat promptot tartalmazó beszélgetési szállón tesszük fel :</p>
+<p>Általános prompt: Földrajzi,demográfia, gazdasági (árézékenység) és tartózkodási idő attribútumok alapján kérnénk egy bizonyos desztinációhoz programajánlót.</p>
+<p>Megkötéses prompt: Ebben a szakaszban a kérést specifikus motivációs indítékokkal (például wellness, sport, kultúra) és szezonális megkötésekkel egészítjük ki. Célunk, hogy felmérjük, miként ajánlja fel az AI a térségben elérhető lehetőségeket ezen szűkített paraméterek mentén.</p>
+<p>Összehasonlító prompt: Az így megalkotott profil (gazdasági helyzet, demográfia, preferált tematikus termékcsoportok és szezonalitás) alapján további öt, hasonló jellegű európai tóparti desztinációra kérünk összehasonlító ajánlatot.</p>
+<p>Fontos hogy minden  profilt külön  threaden külön küldjünk el!</p>
+
+    <h3>3.2. Profilalapú beszélgetési lánc</h3>
+
+    <h4>3.2.1. Általános prompt</h4>
+    <p>Általános prompt célja hogy megértsük hogy tematikus termékcsoportok és szezonalitás hiányában, de földrajzi, demográfiai és gazdasági attribútumok tudatában mit ajánl az AI általánosságban az utazóknak egy bizonyos desztináción belül.</p>
+<p>Példa magyarul :</p>
+<p>Én egy [KOR: 25] éves, [NEM: Férfi] vagyok, szeretnék [ UTAS TÁRSASÁG : párommal] ,[TARTÓZKODÁSI IDŐ : 3 éjszakára]   [ DESZTINÁCIÓ: Balatonra ]  menni. Tudnál a térségben programokat ajánlani nekünk  [ ÁR: max 100 euro per nap ] költséggel ?</p>
+<p>Példa angolul:</p>
+
+    <h4>3.2.2. Megkötéses promptok</h4>
+    <p>A megkötéses promptok alkalmazásának célja, hogy a tematikus termékcsoportok és a szezonalitás figyelembevételével megértsük, miként befolyásolja az AI az utazók döntéseit desztinációs szinten. A vizsgálat arra irányul, hogy az AI milyen típusú ajánlatokat generál bizonyos fogyasztói profilok számára a desztináción belül, és ezeket milyen formában prezentálja.</p>
+
+    <h4>Wellness</h4>
+    <p>Wellness</p>
+<p>Kifejezetten érdekelnek a masszázs szalonok, szaunavilág, relaxáció, spa-hotelek ajánlj  5  helyet a térségben Június és  Augusztus  között.</p>
+<p>Kifejezetten érdekelnek a masszázs szalonok , szaunavilág, relaxáció, spa-hotelek ajánlj  5  helyet a térségben  Szeptember és November között.</p>
+<p>Kifejezetten érdekelnek a masszázs szalonok, szaunavilág, relaxáció, spa-hotelek  ajánlj  5  helyet a térségben December és Február között.</p>
+<p>Kifejezetten érdekelnek a masszázs, szaunavilág, relaxáció, spa-hotelek  ajánlj  5  helyet a térségben  Március és május  között.</p>
+
+    <h4>Gastronomia</h4>
+    <p>Gastronomia</p>
+<p>Kifejezetten érdekelnek a borászatok, termelői piacok, fine dining, helyi specialitások, ajánlj 5 helyet a térségben Június és  Augusztus   között.</p>
+<p>Kifejezetten érdekelnek a borászatok, termelői piacok, fine dining, helyi specialitások, ajánlj  5  helyet a térségben  Szeptember és November között.</p>
+<p>Kifejezetten érdekelnek a borászatok, termelői piacok, fine dining, helyi specialitások,  December és Február között.</p>
+<p>Kifejezetten érdekelnek a borászatok, termelői piacok, fine dining, helyi specialitások,  ajánlj  5  helyet a térségben  Március és május  Között.</p>
+
+    <h4>Aktív turizmus</h4>
+    <p>Aktív turizmus</p>
+<p>Kifejezetten érdekel a kerékpározás , vitorlázás, túraútvonalak, vízi sportok</p>
+<p>ajánlj  5  helyet a térségben Június és  Augusztus   között.</p>
+<p>Kifejezetten érdekel a kerékpározás , vitorlázás, túraútvonalak, vízi sportok,</p>
+<p>ajánlj  5  helyet a térségben Szeptember és November között.</p>
+<p>Kifejezetten érdekel a kerékpározás , vitorlázás, túraútvonalak, vízi sportok,  ajánlj  5  helyet a térségben December és Február között</p>
+<p>Kifejezetten érdekel a kerékpározás , vitorlázás, túraútvonalak, vízi sportok ,ajánlj  5  helyet a térségben Március és május  Között.</p>
+
+    <h4>Egészségturizmus</h4>
+    <p>Egészségturizmus</p>
+<p>Kifejezetten érdekel a termálvíz, orvosi rehabilitáció, gyógykúrák, gyógytorna,</p>
+<p>ajánlj  5  helyet a térségben Június és  Augusztus  között.</p>
+<p>Kifejezetten érdekel a termálvíz, orvosi rehabilitáció, gyógykúrák, gyógytorna, ajánlj  5 helyet a térségben  Szeptember és November között.</p>
+<p>Kifejezetten érdekel a termálvíz, orvosi rehabilitáció, gyógykúrák, gyógytornák, ajánlj  5  helyet a térségben December és Február között.</p>
+<p>Kifejezetten érdekel a termálvíz, orvosi rehabilitáció, gyógykúrák, gyógytornák,  ajánlj  5  helyet a térségben  Március és május  Között.</p>
+
+    <h4>Kultúra és események</h4>
+    <p>Kultúra és események</p>
+<p>Kifejezetten érdekelnek a várak, fesztiválok, múzeumok, történelmi emlékhelyek, templomok ajánlj  5  helyet a térségben Június és  Augusztus  között.</p>
+<p>Kifejezetten érdekelnek a várak, fesztiválok, múzeumok, történelmi emlékhelyek, templomok ajánlj  5  helyet a térségben Szeptember és November között.</p>
+<p>Kifejezetten érdekelnek a várak, fesztiválok, múzeumok, történelmi emlékhelyek, templomok ajánlj  5  helyet a térségben December és Február között.</p>
+<p>Kifejezetten érdekelnek a várak, fesztiválok, múzeumok, történelmi emlékhelyek, templomok ajánlj  5  helyet a térségben  Március és május  Között.</p>
+
+    <h4>Természet- és ökoturizmus</h4>
+    <p>Természet- és ökoturizmus</p>
+<p>Kifejezetten érdekelnek a nemzeti parkok, tanösvények, madármegfigyelés, érintetlen táj, sátrazás ajánlj 5 helyet a térségben Június és  Augusztus  között.</p>
+<p>Kifejezetten érdekelnek a nemzeti parkok, tanösvények, madármegfigyelés, érintetlen táj, sátrazás ajánlj  5  helyet a térségben  Szeptember és November között.</p>
+<p>Kifejezetten érdekelnek a nemzeti parkok, tanösvények, madármegfigyelés, érintetlen táj, sátrazás ajánlj  5  helyet a térségben  December és Február között.</p>
+<p>Kifejezetten érdekelnek a nemzeti parkok, tanösvények, madármegfigyelés, érintetlen táj, sátrazás ajánlj  5  helyet a térségben   Március és május  Között.</p>
+
+    <h4>Agroturizmus</h4>
+    <p>Agroturizmus</p>
+<p>Kifejezetten érdekelnek a tanyasi szálláshelyek, szüret, kézműves műhelyek, vidéki életforma  ajánlj  5  helyet a térségben Június és  Augusztus  között. .</p>
+<p>Kifejezetten érdekelnek a tanyasi szálláshelyek, szüret, kézműves műhelyek, vidéki életforma ajánlj  5 helyet a térségben Szeptember és November között. .</p>
+<p>Kifejezetten érdekelnek a tanyasi szálláshelyek, szüret, kézműves műhelyek, vidéki életforma ajánlj  5  helyet a térségben December és Február között..</p>
+<p>Kifejezetten érdekelnek a tanyasi szálláshelyek, szüret, kézműves műhelyek, vidéki életforma ajánlj  5  helyet a térségben  Március és május  Között.</p>
+
+    <h4>3.2.3. Összehasonlító prompt</h4>
+    <p>Összehasonlító prompt célja hogy AI  ajánljon hasonló tóparti desztinációkat (versenytársakat), amely megfelel az eddig profil igényeinek. Ezáltal össze tudjuk hasonlítani profilokat más desztinációk ajánlataival.</p>
+<p>[DESZTINÁCIÓ: Balatonon ] kívül tudnál ajánlani még öt másik tóparti desztinációt Európában, ahol kifejezetten jó a [Tematikai kategória: wellness] kínálata és illik a profilomhoz és pénztárcámhoz?</p>
+
+    <h3>3.3. Felfedező (EU Desztinációs) promptok</h3>
+    <p>Cél: Megnézni, hogy a Balaton megjelenik-e (Ha igen hányadik helyen/ Milyen desztinációkkal együtt?</p>
+<p>Adatbázis: 5 alkalommal X 3 modellben 9 promptra válasz=135 record</p>
+<p>Prompt 1: Melyik a legszebb tóparti úti cél Közép-Európában ajánlj 5 desztinációt</p>
+<p>Prompt 2: Sorold fel Europában 5 legjelentősebb édesvízi turisztikai desztinációját!</p>
+<p>Prompt 3: Melyik a legszebb tóparti úti cél Közép-Európában? Ajánlj 5 desztinációt.</p>
+<p>Prompt 4:Sorold fel Európában az 5 legjelentősebb édesvízi turisztikai desztinációját!</p>
+<p>Prompt 5:Hol érdemes tóparti nyaralást tervezni Európában?</p>
+<p>Prompt 6:Melyik európai tó mellett érdemes hosszú hétvégét tölteni?</p>
+<p>Prompt 7:Ajánlj 5 tóparti úti célt Európában, amiket érdemes felfedezni!</p>
+<p>Prompt 8:Melyik a legjobb európai tóparti régió, ha valaki először megy tóra nyaralni?</p>
+
+    <h3>3.4. Ábrák</h3>
+    <h4>1 Ábra: Profilalapú beszélgetési szál szerkezete</h4>
+    <p>A négy megkötéses prompt ugyanazon tematikus kategória négy szezonális változatát jelenti egy desztinációra. Mind a hat prompt azonos beszélgetési szálon belül,ugyanabban kontextusban fut le.</p>
+    <div class="figure">
+      <img src="/Users/bence/Desktop/Digitális_AI_Index/docs/pwc_reordered_media/image2.png" alt="1. ábra">
+      <div class="caption">1. ábra</div>
+    </div>
+
+    <h4>2 Ábra: Wellness tematikájú beszélgetési szál</h4>
+    <div class="figure">
+      <img src="/Users/bence/Desktop/Digitális_AI_Index/docs/pwc_reordered_media/image4.png" alt="2. ábra">
+      <div class="caption">2. ábra</div>
+    </div>
+
+    <h4>3 Ábra: Skálázási logika</h4>
+    <div class="figure">
+      <img src="/Users/bence/Desktop/Digitális_AI_Index/docs/pwc_reordered_media/image3.png" alt="3. ábra">
+      <div class="caption">3. ábra</div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>Mellékletek</h2>
+
+    <h3>Melléklet A. Profil variánsok</h3>
+    <table><thead><tr><th>Nem</th><th>Férfi/Nő/Egyéb</th></tr></thead><tbody><tr><td>Életkor</td><td>25 , 45 , 65</td></tr><tr><td>Származás/nyelv</td><td>Versenytárstól függően és piactól függően</td></tr><tr><td>Árérzékeny</td><td>Alacsony / közepes / magas</td></tr><tr><td>Utas társaság:</td><td>egyedül / pár / baráti társaság / család gyerekkel</td></tr><tr><td>Szezon/ Évszakok</td><td>Tél, Tavasz Nyár, Ősz</td></tr><tr><td>Attrakció csoportok  (USP dimenziók) :</td><td>Wellness  / Gastronomia / Aktív turizmus/ Egészségturizmus / Kultúra és események/ Természet- és ökoturizmus / Agroturizmus,</td></tr><tr><td>Tartózkodási idő:</td><td>2  éjszaka  3 éjszaka, 5 éjszaka, 7 éjszaka</td></tr><tr><td>Desztináció</td><td>Bledi-tó , Genfi-tó, Comói-tó, Ohridi-tó, Boden-tóIsztriai félsziget</td></tr></tbody></table>
+
+    <h3>Melléklet B. Desztináció tematikus termékcsoportok</h3>
+    <p>A kutatás a következő tematikus kategóriákba sorolja a térség szolgáltatásait:</p>
+    <table><thead><tr><th>Tematikus termékcsoportok</th><th>Prompt attribútumok kiegészítése</th></tr></thead><tbody><tr><td>Wellness</td><td>Masszázs szalonok, szaunavilág, relaxáció, spa-hotelek</td></tr><tr><td>Gastronomia</td><td>Borászatok, termelői piacok, fine dining, helyi specialitások</td></tr><tr><td>Aktív turizmus</td><td>Kerékpározás , vitorlázás, túraútvonalak, vízi sportok</td></tr><tr><td>Egészségturizmus</td><td>Termálvíz, orvosi rehabilitáció, gyógykúrák, gyógytorna</td></tr><tr><td>Kultúra és események</td><td>Várak, fesztiválok, múzeumok, történelmi emlékhelyek, templomok</td></tr><tr><td>Természet- és ökoturizmus</td><td>Nemzeti parkok, tanösvények, madármegfigyelés, érintetlen táj, sátrazás</td></tr><tr><td>Agroturizmus</td><td>Tanyasi szálláshelyek, szüret, kézműves műhelyek, vidéki életforma</td></tr></tbody></table>
+
+    <h3>Melléklet C. Profilok</h3>
+    <p class="appendix-note">A korábbi <strong>Melléklet D</strong> itt már új számozással szerepel, mert a kérdések blokk visszakerült a főszövegbe.</p>
+    <p>Ezeket a profiloka :Több nyelven vagy  versenytársi piacból is érdemes vizsgálni :</p>
+    <table><thead><tr><th>Profil neveket</th><th>Profil attribútumok</th></tr></thead><tbody><tr><td>Fiatal pár (férfi):</td><td>Férfi, 25 éves, magyar, árérzékenysége közepes, párban utazik, tartózkodása 2 éjszaka</td></tr><tr><td>Baráti társaság fiatal (nő):</td><td>Nő, 25 éves, magyar, árérzékenysége alacsony, barátokkal utazik, tartózkodása 3 éjszaka</td></tr><tr><td>Fiatal családos (férfi):</td><td>Férfi, 25 éves, magyar, árérzékenysége közepes, család gyerekkel utazik, tartózkodása 7 éjszaka</td></tr><tr><td>Középkorú pár (nő):</td><td>Nő, 45 éves, magyar, árérzékenysége alacsony, párban utazik, tartózkodása 7 éjszaka</td></tr><tr><td>Egyedül utazó középkorú( férfi):</td><td>férfi, 45 éves, magyar, árérzékenysége közepes, egyedül utazik, tartózkodása 3 éjszaka</td></tr><tr><td>Családos középkorú (nő):</td><td>nő, 45 éves, magyar, árérzékenysége magas, család gyerekkel utazik, tartózkodása 7 éjszaka</td></tr><tr><td>Baráti társaság középkorú (férfi)</td><td>férfi, 45 éves, magyar, árérzékenysége alacsony, barátokkal utazik, tartózkodása 7 éjszaka</td></tr><tr><td>Nyugdíjas  csoport (nő)</td><td>nő, 65 éves, magyar, árérzékenysége közepes, barátokkal utazik, tartózkodása 7 éjszaka</td></tr><tr><td>Nyugdíjas pár (férfi)</td><td>férfi, 65 éves, magyar, árérzékenysége alacsony, párban utazik, tartózkodása 5 éjszaka</td></tr><tr><td>Többgenerációs családos nyugdíjas (nő)</td><td>nő, 65 éves, magyar, árérzékenysége magas, család gyerekkel utazik, tartózkodása 7 éjszaka, télen</td></tr><tr><td>Baráti társaság nyugdíjas (férfi)</td><td>férfi, 65 éves, magyar, árérzékenysége közepes, barátokkal utazik, tartózkodása 3 éjszaka, tavasszal</td></tr><tr><td>Egyedülálló fiatal nő:</td><td>nő, 25 éves, magyar, árérzékenysége magas, egyedül utazik, tartózkodása 3 éjszaka, nyáron.</td></tr></tbody></table>
+
+    <h3>Melléklet D. Adatbázis struktúra ábrája</h3>
+    <p class="appendix-note">A korábbi <strong>Melléklet E</strong> itt új számozással szerepel.</p>
+    <div class="figure">
+      <img src="/Users/bence/Desktop/Digitális_AI_Index/docs/pwc_reordered_media/image1.png" alt="Adatbázis struktúra ábrája">
+      <div class="caption">Melléklet D</div>
+    </div>
+
+    <h2>Irodalom</h2>
+    <p class="small">Az irodalomjegyzék a forrásdokumentumban a dokumentum végén marad. Ebben az átrendezett munkaverzióban a szerkezeti áthelyezés volt az elsődleges cél.</p>
+  </main>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <title>2.2 rész – beszúrási útmutató</title>
+  <style>
+    :root{
+      --ink:#111418;
+      --muted:#5b6470;
+      --rule:#d8dde2;
+      --tint:#f5f6f4;
+      --accent:#eef1f4;
+      --hi:#fff5d6;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:#fff;color:var(--ink)}
+    body{font-family: Georgia, "Times New Roman", serif;}
+    .page{max-width:1040px;margin:0 auto;padding:56px 56px 72px}
+    .rule-top{border-top:2.5px solid var(--ink);padding-top:26px;margin-bottom:28px}
+    .kicker{font-family:Arial,sans-serif;color:var(--muted);text-transform:uppercase;letter-spacing:.22em;font-size:12px;font-weight:700;margin:0 0 10px}
+    h1{font-size:34px;line-height:1.12;margin:0 0 10px}
+    h2{font-size:26px;margin:34px 0 14px}
+    h3{font-size:22px;margin:26px 0 12px}
+    p, li{font-size:17px;line-height:1.62}
+    ul{margin:8px 0 18px 22px}
+    .lead{font-size:18px;line-height:1.58;margin:0 0 24px}
+    .note{background:var(--tint);border:1px solid var(--rule);padding:16px 18px;margin:18px 0 24px}
+    .block{border:1px solid var(--rule);padding:18px 20px;background:#fbfbfa;margin:16px 0 28px}
+    .new{background:var(--hi)}
+    .small{font-size:15px;color:var(--muted)}
+    .where{background:#fafafa;border:1px solid var(--rule);padding:16px 18px;margin:14px 0 20px}
+    .where p{margin:0 0 8px}
+    .page-break{break-before:page;page-break-before:always}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="rule-top">
+      <p class="kicker">Mikrolépés · 2.2</p>
+      <h1>A 2.2 rész teljes, frissített változata és pontos beszúrási helyei</h1>
+      <p class="lead">Ez a lap csak a <strong>2.2. Módszertani keret és kutatási design</strong> részhez készült. A <strong>félkövér</strong> részek az új szövegek. A dobozokban azt látod, hogy az eredeti dokumentumban <strong>pontosan hova</strong> kell őket beszúrni.</p>
+    </div>
+
+    <div class="note">
+      <p><strong>Ebben a lépésben nem kell a 3. fejezetet mozgatni.</strong> A cél csak az, hogy a 2.2 már tükrözze a 3. fejezetben tisztázott adatgyűjtési logikát.</p>
+    </div>
+
+    <h2>1. Első új rész – hova kell beszúrni?</h2>
+    <div class="where">
+      <p><strong>Beszúrás helye:</strong> a <strong>második bekezdés után</strong>.</p>
+      <p><strong>Ez után:</strong> „A módszertani keret kialakítása során kiemelt szempont volt...”</p>
+      <p><strong>És ez elé:</strong> „A teljes mérési folyamat négy egymásra épülő...”</p>
+    </div>
+
+    <div class="block new">
+      <p><strong>A kutatási design profilalapú logikát követ, amelyben az egyes lekérdezések előre definiált demográfiai, gazdasági és utazási attribútumokkal rendelkező profilok mentén kerülnek kialakításra. Az azonos profilokhoz tartozó lekérdezések minden vizsgált modell esetében egységes promptstruktúra szerint futnak le, ami biztosítja a modellek közötti összehasonlíthatóságot és a mérés reprodukálhatóságát. A módszertan egyik alapelve, hogy minden profil külön, izolált beszélgetési szálban kerül futtatásra, így az egyes lekérdezések egymástól függetlenek maradnak, és az eredmények nem torzulnak korábbi interakciók hatására. A promptalapú adatgyűjtési keret konkrét operatív felépítését a 3. fejezet mutatja be részletesen.</strong></p>
+    </div>
+
+    <h2>2. Második új rész – hova kell beszúrni?</h2>
+    <div class="where">
+      <p><strong>Beszúrás helye:</strong> a <strong>2.2 utolsó bekezdésének végére</strong>.</p>
+      <p><strong>Ez a bekezdés így kezdődik:</strong> „Ezen túlmenően a design implicit módon kezeli...”</p>
+    </div>
+
+    <div class="block new">
+      <p><strong>A 2. fejezet a keret módszertani megalapozását adja, míg a 3. fejezet a promptalapú adatgyűjtés gyakorlati szerkezetét és végrehajtási logikáját rögzíti.</strong></p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>3. A 2.2 eredeti része</h2>
+    <div class="block">
+      <h3>2.2. Módszertani keret és kutatási design</h3>
+      <p>A kutatás egy strukturált, audit-alapú megközelítést alkalmaz, amely kontrollált természetes nyelvi lekérdezéseken keresztül vizsgálja a generatív mesterséges intelligencia rendszerek (LLM-ek) válaszstruktúráit és ajánlási mintázatait. Az audit-alapú design célja, hogy a valós felhasználói interakciókat modellezve, de standardizált körülmények között tegye mérhetővé az AI által közvetített desztinációs láthatóságot. Ez a megközelítés lehetővé teszi az AI-ajánlások szisztematikus feltérképezését, valamint a különböző modellek, piacok és desztinációk közötti konzisztens és reprodukálható összehasonlítást.</p>
+      <p>A módszertani keret kialakítása során kiemelt szempont volt, hogy a vizsgálat ne egyedi lekérdezésekre vagy eseti eredményekre épüljön, hanem egy olyan szabályozott kísérleti környezetet hozzon létre, amelyben az AI rendszerek viselkedése mérhető és értelmezhető. Ennek megfelelően a kutatás nem egyszeri adatgyűjtést, hanem egy ismételhető mérési protokollt alkalmaz, amely lehetővé teszi az időbeli és földrajzi összehasonlításokat is.</p>
+      <p>A teljes mérési folyamat négy egymásra épülő, logikailag elkülönülő fázisból áll:</p>
+      <p>(1) Standardizált prompt-alapú adatgyűjtés. Ebben a fázisban a desztinációk láthatóságát természetes nyelvi lekérdezéseken keresztül mérjük. A lekérdezések előre definiált, strukturált prompt-keretrendszer alapján kerülnek kialakításra, amely biztosítja az inputok egységességét. A cél nem az egyedi válaszok elemzése, hanem az AI rendszerek válaszmintázatainak aggregált vizsgálata.</p>
+      <p>(2) Strukturált adatkinyerés és feldolgozás. A generált válaszok strukturálatlan szöveges formából strukturált adattá kerülnek átalakításra. Ez a lépés biztosítja, hogy a desztinációk megjelenése, rangsora, kontextusa és kapcsolatai kvantitatív módon elemezhetők legyenek. A feldolgozás során külön figyelmet kap az entitások egységesítése és a torzító tényezők kiszűrése.</p>
+      <p>(3) AI Visibility Score számítás. A strukturált adatok alapján egy többdimenziós scoring modell kerül alkalmazásra, amely a desztinációk láthatóságát nemcsak gyakoriság, hanem pozíció, tematikus lefedettség és versenytársi kontextus mentén is értékeli. Ez a fázis biztosítja a mérés kvantitatív, összehasonlítható outputját.</p>
+      <p>(4) Benchmarking és stratégiai értelmezés. A score-ok és az azok mögött álló mintázatok összehasonlítása történik a kiválasztott versenytárs desztinációkkal. Az elemzés célja nem csupán a rangsorolás, hanem a relatív pozíciók, strukturális különbségek és láthatósági hiányterületek azonosítása, amelyek alapot adnak a későbbi stratégiai beavatkozásokhoz.</p>
+      <p>A módszertan egyik legfontosabb alapelve a kontrollált kísérleti környezet biztosítása. Ennek érdekében minden lekérdezés izolált interakciós környezetben (külön sessionben vagy threadben) kerül végrehajtásra. Ez kritikus jelentőségű, mivel a generatív AI modellek válaszai erősen függnek az előzményektől és a kontextustól. Az izoláció biztosítja, hogy az egyes lekérdezések egymástól függetlenek legyenek, és az eredmények ne torzuljanak korábbi interakciók hatására.</p>
+      <p>Ezen túlmenően a design implicit módon kezeli az AI rendszerek működéséből fakadó torzításokat is. A szakirodalom rámutat arra, hogy az LLM-ek hajlamosak a már ismert, erősen reprezentált desztinációk felülreprezentálására és a láthatóság koncentrálására. A standardizált, többdimenziós lekérdezési struktúra és a benchmarking beépítése ezért kulcsfontosságú a torzítások azonosítása és értelmezése szempontjából.</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>4. A 2.2 frissített, teljes változata</h2>
+    <div class="block">
+      <h3>2.2. Módszertani keret és kutatási design</h3>
+      <p>A kutatás egy strukturált, audit-alapú megközelítést alkalmaz, amely kontrollált természetes nyelvi lekérdezéseken keresztül vizsgálja a generatív mesterséges intelligencia rendszerek (LLM-ek) válaszstruktúráit és ajánlási mintázatait. Az audit-alapú design célja, hogy a valós felhasználói interakciókat modellezve, de standardizált körülmények között tegye mérhetővé az AI által közvetített desztinációs láthatóságot. Ez a megközelítés lehetővé teszi az AI-ajánlások szisztematikus feltérképezését, valamint a különböző modellek, piacok és desztinációk közötti konzisztens és reprodukálható összehasonlítást.</p>
+      <p>A módszertani keret kialakítása során kiemelt szempont volt, hogy a vizsgálat ne egyedi lekérdezésekre vagy eseti eredményekre épüljön, hanem egy olyan szabályozott kísérleti környezetet hozzon létre, amelyben az AI rendszerek viselkedése mérhető és értelmezhető. Ennek megfelelően a kutatás nem egyszeri adatgyűjtést, hanem egy ismételhető mérési protokollt alkalmaz, amely lehetővé teszi az időbeli és földrajzi összehasonlításokat is.</p>
+      <p><strong>A kutatási design profilalapú logikát követ, amelyben az egyes lekérdezések előre definiált demográfiai, gazdasági és utazási attribútumokkal rendelkező profilok mentén kerülnek kialakításra. Az azonos profilokhoz tartozó lekérdezések minden vizsgált modell esetében egységes promptstruktúra szerint futnak le, ami biztosítja a modellek közötti összehasonlíthatóságot és a mérés reprodukálhatóságát. A módszertan egyik alapelve, hogy minden profil külön, izolált beszélgetési szálban kerül futtatásra, így az egyes lekérdezések egymástól függetlenek maradnak, és az eredmények nem torzulnak korábbi interakciók hatására. A promptalapú adatgyűjtési keret konkrét operatív felépítését a 3. fejezet mutatja be részletesen.</strong></p>
+      <p>A teljes mérési folyamat négy egymásra épülő, logikailag elkülönülő fázisból áll:</p>
+      <p>(1) Standardizált prompt-alapú adatgyűjtés. Ebben a fázisban a desztinációk láthatóságát természetes nyelvi lekérdezéseken keresztül mérjük. A lekérdezések előre definiált, strukturált prompt-keretrendszer alapján kerülnek kialakításra, amely biztosítja az inputok egységességét. A cél nem az egyedi válaszok elemzése, hanem az AI rendszerek válaszmintázatainak aggregált vizsgálata.</p>
+      <p>(2) Strukturált adatkinyerés és feldolgozás. A generált válaszok strukturálatlan szöveges formából strukturált adattá kerülnek átalakításra. Ez a lépés biztosítja, hogy a desztinációk megjelenése, rangsora, kontextusa és kapcsolatai kvantitatív módon elemezhetők legyenek. A feldolgozás során külön figyelmet kap az entitások egységesítése és a torzító tényezők kiszűrése.</p>
+      <p>(3) AI Visibility Score számítás. A strukturált adatok alapján egy többdimenziós scoring modell kerül alkalmazásra, amely a desztinációk láthatóságát nemcsak gyakoriság, hanem pozíció, tematikus lefedettség és versenytársi kontextus mentén is értékeli. Ez a fázis biztosítja a mérés kvantitatív, összehasonlítható outputját.</p>
+      <p>(4) Benchmarking és stratégiai értelmezés. A score-ok és az azok mögött álló mintázatok összehasonlítása történik a kiválasztott versenytárs desztinációkkal. Az elemzés célja nem csupán a rangsorolás, hanem a relatív pozíciók, strukturális különbségek és láthatósági hiányterületek azonosítása, amelyek alapot adnak a későbbi stratégiai beavatkozásokhoz.</p>
+      <p>A módszertan egyik legfontosabb alapelve a kontrollált kísérleti környezet biztosítása. Ennek érdekében minden lekérdezés izolált interakciós környezetben (külön sessionben vagy threadben) kerül végrehajtásra. Ez kritikus jelentőségű, mivel a generatív AI modellek válaszai erősen függnek az előzményektől és a kontextustól. Az izoláció biztosítja, hogy az egyes lekérdezések egymástól függetlenek legyenek, és az eredmények ne torzuljanak korábbi interakciók hatására.</p>
+      <p>Ezen túlmenően a design implicit módon kezeli az AI rendszerek működéséből fakadó torzításokat is. A szakirodalom rámutat arra, hogy az LLM-ek hajlamosak a már ismert, erősen reprezentált desztinációk felülreprezentálására és a láthatóság koncentrálására. A standardizált, többdimenziós lekérdezési struktúra és a benchmarking beépítése ezért kulcsfontosságú a torzítások azonosítása és értelmezése szempontjából. <strong>A 2. fejezet a keret módszertani megalapozását adja, míg a 3. fejezet a promptalapú adatgyűjtés gyakorlati szerkezetét és végrehajtási logikáját rögzíti.</strong></p>
+    </div>
+
+    <h2>5. Egy mondatban a teendő</h2>
+    <div class="note">
+      <p>Tartsd meg az eredeti `2.2` szövegét, és <strong>két helyen</strong> egészítsd ki: egyszer középen egy új bekezdéssel, egyszer a végén egy új zárómondattal.</p>
+    </div>
+  </main>
+</body>
+</html>

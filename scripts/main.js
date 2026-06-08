@@ -2,6 +2,9 @@ const { runSession } = require("./session_flow");
 
 const PROFILE_ID = Number(process.argv[2] || 1);
 const FOLLOW_UP_LIMIT = Number(process.argv[3] || 4);
+const INTEREST_TYPE = process.argv[4] || null;
+const REPEAT_INDEX = Number(process.argv[5] || 1);
+const SAVE_TO_DB = !process.argv.includes("--no-save");
 
 function printSources(sources) {
   if (!sources.length) {
@@ -27,7 +30,9 @@ async function main() {
   const result = await runSession({
     profileId: PROFILE_ID,
     followUpLimit: FOLLOW_UP_LIMIT,
-    saveToDb: true,
+    interestType: INTEREST_TYPE,
+    repeatIndex: REPEAT_INDEX,
+    saveToDb: SAVE_TO_DB,
   });
 
   console.log("PROFILE OBJECT:");
@@ -35,6 +40,8 @@ async function main() {
 
   printSection("SESSION ID", result.sessionId);
   printSection("MODEL", result.modelName);
+  printSection("SAVE TO DB", SAVE_TO_DB ? "yes" : "no");
+  printSection("REPEAT INDEX", String(REPEAT_INDEX));
   printSection("MESSAGES TRACE", JSON.stringify(result.trace, null, 2));
 
   printSection("GENERAL COMPLETION ID", result.general.completionId);

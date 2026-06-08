@@ -1,0 +1,75 @@
+<svg width="1600" height="1600" viewBox="0 0 1600 1600" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Skálázási logika egy desztinációra vetítve</title>
+  <desc id="desc">Matematikai ábra egy desztinációra vetített promptmennyiség számításáról, skálázási tényezőkkel.</desc>
+  <defs>
+    <style>
+      .bg { fill: #ffffff; }
+      .muted { fill: #5b6470; }
+      .rule { stroke: #111418; stroke-width: 2.5; fill: none; }
+      .box { fill: #ffffff; stroke: #111418; stroke-width: 2; rx: 0; ry: 0; }
+      .box-soft { fill: #ffffff; stroke: #5b6470; stroke-width: 1.5; rx: 0; ry: 0; }
+      .box-tint { fill: #f3f4f2; stroke: #111418; stroke-width: 2; rx: 0; ry: 0; }
+      .label { font-family: Inter, Arial, Helvetica, sans-serif; font-size: 17px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; fill: #5b6470; }
+      .tag { font-family: Inter, Arial, Helvetica, sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; fill: #5b6470; }
+      .title-text { font-family: "Source Serif 4", Georgia, "Times New Roman", serif; font-size: 38px; font-weight: 700; fill: #111418; }
+      .intro { font-family: "Source Serif 4", Georgia, "Times New Roman", serif; font-size: 34px; font-weight: 700; fill: #111418; }
+      .kicker { font-family: Inter, Arial, Helvetica, sans-serif; font-size: 20px; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; fill: #5b6470; }
+      .formula { font-family: "Source Serif 4", Georgia, "Times New Roman", serif; font-size: 56px; font-weight: 700; letter-spacing: -1px; fill: #111418; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1600" class="bg"/>
+  <line class="rule" x1="72" y1="72" x2="1528" y2="72"/>
+  <text class="kicker" x="72" y="124">Skálázási logika egy desztinációra vetítve</text>
+
+  <rect class="box" x="72" y="404" width="1456" height="124"/>
+  <text class="tag" x="800" y="452" text-anchor="middle">I · kiinduló</text>
+  <text class="title-text" x="800" y="497" text-anchor="middle">1 beszélgetési szál = 6 prompt</text>
+
+  <line class="rule" x1="800" y1="528" x2="800" y2="560"/>
+  <line class="rule" x1="320" y1="560" x2="1280" y2="560"/>
+  <line class="rule" x1="320" y1="560" x2="320" y2="606"/>
+  <line class="rule" x1="560" y1="560" x2="560" y2="606"/>
+  <line class="rule" x1="800" y1="560" x2="800" y2="606"/>
+  <line class="rule" x1="1040" y1="560" x2="1040" y2="606"/>
+  <line class="rule" x1="1280" y1="560" x2="1280" y2="606"/>
+  <polygon points="320,620 311,604 329,604" fill="#111418"/>
+  <polygon points="560,620 551,604 569,604" fill="#111418"/>
+  <polygon points="800,620 791,604 809,604" fill="#111418"/>
+  <polygon points="1040,620 1031,604 1049,604" fill="#111418"/>
+  <polygon points="1280,620 1271,604 1289,604" fill="#111418"/>
+
+  <rect class="box-soft" x="72" y="620" width="344" height="136"/>
+  <text class="title-text" x="244" y="684" text-anchor="middle">× 3</text>
+  <text class="label" x="244" y="724" text-anchor="middle">AI modell</text>
+
+  <rect class="box-soft" x="448" y="620" width="344" height="136"/>
+  <text class="title-text" x="620" y="684" text-anchor="middle">× 5</text>
+  <text class="label" x="620" y="716" text-anchor="middle">
+    <tspan x="620" dy="0">Heurisztikus</tspan>
+    <tspan x="620" dy="22">ismétlés</tspan>
+  </text>
+
+  <rect class="box-soft" x="824" y="620" width="344" height="136"/>
+  <text class="title-text" x="996" y="684" text-anchor="middle">× 12</text>
+  <text class="label" x="996" y="724" text-anchor="middle">Profil</text>
+
+  <rect class="box-soft" x="1200" y="620" width="328" height="136"/>
+  <text class="title-text" x="1364" y="684" text-anchor="middle">× 7</text>
+  <text class="label" x="1364" y="716" text-anchor="middle">
+    <tspan x="1364" dy="0">Tematikus</tspan>
+    <tspan x="1364" dy="22">kategória</tspan>
+  </text>
+
+  <line class="rule" x1="244" y1="756" x2="244" y2="798"/>
+  <line class="rule" x1="620" y1="756" x2="620" y2="798"/>
+  <line class="rule" x1="996" y1="756" x2="996" y2="798"/>
+  <line class="rule" x1="1364" y1="756" x2="1364" y2="798"/>
+  <line class="rule" x1="244" y1="798" x2="1364" y2="798"/>
+  <line class="rule" x1="804" y1="798" x2="804" y2="844"/>
+  <polygon points="804,858 795,842 813,842" fill="#111418"/>
+
+  <rect class="box-tint" x="72" y="858" width="1456" height="150"/>
+  <text class="tag" x="800" y="918" text-anchor="middle">II · végeredmény</text>
+  <text class="formula" x="800" y="978" text-anchor="middle">6 × 3 × 5 × 12 × 7 = 7 560 prompt / desztináció</text>
+</svg>

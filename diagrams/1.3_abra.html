@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8" />
+<title>1.3 ábra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#111418;
+    --muted:#5b6470;
+    --muted-2:#8a929c;
+    --rule:#c9ced4;
+    --tint:#f3f4f2;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#fff;color:var(--ink);font-family:"Source Serif 4", Georgia, serif;}
+  #capture{
+    width:1480px;
+    padding:72px 72px 76px;
+    background:#fff;
+  }
+  .rule-top{
+    border-top:2.5px solid var(--ink);
+    padding-top:34px;
+    margin-bottom:36px;
+  }
+  .kicker{
+    font-family:"Inter",sans-serif;
+    font-size:20px;
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:600;
+    margin:0;
+  }
+
+  .node{
+    border:2px solid var(--ink);
+    background:#fff;
+    padding:28px 30px;
+    text-align:center;
+  }
+  .node .tag{
+    font-family:"Inter",sans-serif;
+    font-size:16px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:700;
+    margin-bottom:10px;
+  }
+  .node .title{
+    font-family:"Source Serif 4",serif;
+    font-size:38px;
+    font-weight:700;
+    letter-spacing:-.01em;
+    line-height:1.2;
+  }
+
+  .center-block{ margin-bottom:28px; }
+  .center-block .node{ width:100%; }
+  .connector{
+    display:block;
+    height:66px;
+    position:relative;
+  }
+  .connector svg{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+  }
+
+  .factor-row{
+    display:grid;
+    grid-template-columns: repeat(4,1fr);
+    gap:22px;
+    margin-bottom:30px;
+  }
+  .factor-row .node{
+    border-width:1.5px;
+    padding:26px 14px 22px;
+  }
+  .factor-row .node .title{
+    font-size:30px;
+  }
+  .factor-row .node .sub{
+    font-family:"Inter",sans-serif;
+    font-size:16px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--muted-2);
+    margin-top:10px;
+    font-weight:600;
+    line-height:1.35;
+  }
+
+  .formula-box{
+    border:2px solid var(--ink);
+    background:var(--tint);
+    padding:30px 32px 26px;
+    text-align:center;
+  }
+  .formula-box .tag{
+    font-family:"Inter",sans-serif;
+    font-size:16px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:700;
+    margin-bottom:12px;
+  }
+  .formula{
+    font-family:"Source Serif 4",serif;
+    font-size:52px;
+    font-weight:700;
+    line-height:1.15;
+    letter-spacing:-.02em;
+  }
+</style>
+</head>
+<body>
+
+<div id="capture">
+  <div class="rule-top">
+    <p class="kicker">Skálázási logika egy desztinációra vetítve</p>
+  </div>
+
+  <div class="center-block">
+    <div class="node">
+      <div class="tag">I · kiinduló</div>
+      <div class="title">1 beszélgetési szál = 6 prompt</div>
+    </div>
+  </div>
+
+  <div class="connector">
+    <svg viewBox="0 0 500 66" preserveAspectRatio="none">
+      <line x1="250" y1="0" x2="250" y2="22" stroke="#111418" stroke-width="2"/>
+      <line x1="100" y1="22" x2="400" y2="22" stroke="#111418" stroke-width="2"/>
+      <line x1="100" y1="22" x2="100" y2="54" stroke="#111418" stroke-width="2"/>
+      <line x1="200" y1="22" x2="200" y2="54" stroke="#111418" stroke-width="2"/>
+      <line x1="300" y1="22" x2="300" y2="54" stroke="#111418" stroke-width="2"/>
+      <line x1="400" y1="22" x2="400" y2="54" stroke="#111418" stroke-width="2"/>
+      <polygon points="100,66 93,52 107,52" fill="#111418"/>
+      <polygon points="200,66 193,52 207,52" fill="#111418"/>
+      <polygon points="300,66 293,52 307,52" fill="#111418"/>
+      <polygon points="400,66 393,52 407,52" fill="#111418"/>
+    </svg>
+  </div>
+
+  <div class="factor-row">
+    <div class="node">
+      <div class="title">× 3</div>
+      <div class="sub">AI modell</div>
+    </div>
+    <div class="node">
+      <div class="title">× 5</div>
+      <div class="sub">Heurisztikus<br/>ismétlés</div>
+    </div>
+    <div class="node">
+      <div class="title">× 12</div>
+      <div class="sub">Profil</div>
+    </div>
+    <div class="node">
+      <div class="title">× 7</div>
+      <div class="sub">Tematikus<br/>kategória</div>
+    </div>
+  </div>
+
+  <div class="connector">
+    <svg viewBox="0 0 500 66" preserveAspectRatio="none">
+      <line x1="100" y1="0" x2="100" y2="22" stroke="#111418" stroke-width="2"/>
+      <line x1="200" y1="0" x2="200" y2="22" stroke="#111418" stroke-width="2"/>
+      <line x1="300" y1="0" x2="300" y2="22" stroke="#111418" stroke-width="2"/>
+      <line x1="400" y1="0" x2="400" y2="22" stroke="#111418" stroke-width="2"/>
+      <line x1="100" y1="22" x2="400" y2="22" stroke="#111418" stroke-width="2"/>
+      <line x1="250" y1="22" x2="250" y2="54" stroke="#111418" stroke-width="2"/>
+      <polygon points="250,66 243,52 257,52" fill="#111418"/>
+    </svg>
+  </div>
+
+  <div class="formula-box">
+    <div class="tag">II · végeredmény</div>
+    <div class="formula">6 × 3 × 5 × 12 × 7 = 7 560 prompt / desztináció</div>
+  </div>
+</div>
+
+</body>
+</html>

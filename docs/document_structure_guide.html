@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <title>Dokumentumszerkezeti útmutató</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --ink:#111418;
+      --muted:#5b6470;
+      --rule:#d6dbe0;
+      --tint:#f5f6f4;
+      --tint-2:#fafafa;
+      --accent:#e9ecef;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:#fff;color:var(--ink)}
+    body{font-family:"Source Serif 4", Georgia, serif;}
+    .page{
+      max-width:1000px;
+      margin:0 auto;
+      padding:56px 56px 72px;
+    }
+    .rule-top{
+      border-top:2.5px solid var(--ink);
+      padding-top:28px;
+      margin-bottom:28px;
+    }
+    .kicker{
+      font-family:"Inter", Arial, sans-serif;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.22em;
+      font-size:13px;
+      font-weight:700;
+      margin:0 0 10px;
+    }
+    h1{
+      font-size:34px;
+      line-height:1.15;
+      margin:0 0 10px;
+      font-weight:700;
+      letter-spacing:-.02em;
+    }
+    .lead{
+      font-size:18px;
+      line-height:1.55;
+      margin:0 0 28px;
+    }
+    h2{
+      font-size:24px;
+      margin:34px 0 14px;
+      line-height:1.2;
+    }
+    p, li{
+      font-size:17px;
+      line-height:1.6;
+    }
+    ul{
+      margin:10px 0 0 0;
+      padding-left:22px;
+    }
+    .note{
+      background:var(--tint);
+      border:1px solid var(--rule);
+      padding:16px 18px;
+      margin:18px 0 24px;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin:18px 0 28px;
+      table-layout:fixed;
+    }
+    th, td{
+      border:1px solid var(--rule);
+      padding:14px 14px;
+      vertical-align:top;
+      text-align:left;
+    }
+    th{
+      background:var(--accent);
+      font-family:"Inter", Arial, sans-serif;
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      color:var(--muted);
+      font-weight:700;
+    }
+    td{
+      background:var(--tint-2);
+      font-size:16px;
+      line-height:1.55;
+    }
+    .mono{
+      font-family:"Inter", Arial, sans-serif;
+      font-weight:600;
+    }
+    .small{
+      font-size:15px;
+      color:var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="rule-top">
+      <p class="kicker">Szerkezeti útmutató</p>
+      <h1>Mit kell átpakolni, hogy a dokumentum jobban illeszkedjen Ádám logikájához</h1>
+      <p class="lead">
+        Ádám megjegyzése valószínűleg nem teljes újraírást jelent, hanem azt, hogy a már világos
+        <span class="mono">3. fejezetes prompt-alapú adatgyűjtési logikához</span> kell
+        jobban hozzáigazítani a meglévő főfejezeteket, főleg a <span class="mono">2. fejezetet</span>.
+      </p>
+    </div>
+
+    <div class="note">
+      <p><strong>Röviden:</strong> nem szétszedni kell mindent, hanem rendezni és hozzáhúzni.</p>
+      <p class="small">A legfontosabb mozgás: a kutatási kérdések ne mellékletben legyenek, hanem a főszövegben.</p>
+    </div>
+
+    <h2>1. Mit ne bánts most</h2>
+    <ul>
+      <li><span class="mono">1. fejezet</span>: maradhat.</li>
+      <li><span class="mono">2.1 cím</span> és a fő módszertani gerinc: maradhat.</li>
+      <li><span class="mono">3.2–3.4</span> alaplogikája: maradhat.</li>
+      <li>A mellékletek nagy része maradhat mellékletként.</li>
+    </ul>
+
+    <h2>2. Mit kell átmozgatni vagy átírni</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Most hol van</th>
+          <th>Hova kerüljön</th>
+          <th>Miért</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Melléklet C: Kérdések</strong></td>
+          <td><strong>2.1.1. Kutatási kérdések</strong></td>
+          <td>A kutatási kérdések nem háttéranyagok, hanem a teljes módszertani fejezet indoklása.</td>
+        </tr>
+        <tr>
+          <td><strong>2.2. Módszertani keret és kutatási design</strong></td>
+          <td><strong>Maradjon ott, de kapjon 1–2 mondatos pontosítást</strong></td>
+          <td>Itt kell kimondani, hogy a módszer prompt-alapú audit designra épül, amelyet a 3. fejezet operacionalizál.</td>
+        </tr>
+        <tr>
+          <td><strong>2.3. Adatgyűjtési volumen és modellek</strong></td>
+          <td><strong>Maradjon ott, de legyen benne a konkrét promptstruktúra</strong></td>
+          <td>Ne csak általánosan beszéljen “sok prompt”-ról, hanem tükrözze a már tiszta 6-promptos beszélgetési szál logikát.</td>
+        </tr>
+        <tr>
+          <td><strong>2.4. Adatkinyerés és strukturálás</strong></td>
+          <td><strong>Maradjon ott, de kapcsolódjon vissza a 3. fejezethez</strong></td>
+          <td>Itt kell világossá tenni, hogy a strukturálás inputja a 3. fejezetben meghatározott standardizált promptkeretből jön.</td>
+        </tr>
+        <tr>
+          <td><strong>3.1. Keretrendszer</strong></td>
+          <td><strong>Maradjon ott, de tisztítsd a megfogalmazást</strong></td>
+          <td>Ez a kapocs a 2. fejezet metodológiája és a 3. fejezet operatív promptlogikája között.</td>
+        </tr>
+        <tr>
+          <td><strong>Melléklet A, B, D, E</strong></td>
+          <td><strong>Maradjanak mellékletben</strong></td>
+          <td>Ezek háttér- és technikai anyagok, nem kell őket a főszövegbe erőltetni.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>3. A legfontosabb szöveges igazítások</h2>
+    <ul>
+      <li><strong>2.2 végére</strong>: kerüljön egy mondat arról, hogy a módszertani keret operatív megvalósítását a 3. fejezet promptstruktúrája adja.</li>
+      <li><strong>2.3-ban</strong>: jelenjen meg, hogy egy beszélgetési szál 1 általános, 4 megkötéses és 1 összehasonlító promptból áll.</li>
+      <li><strong>2.4-ben</strong>: jelenjen meg, hogy az adatkinyerés inputja a standardizált promptalapú adatgyűjtés outputja.</li>
+      <li><strong>3.1-ben</strong>: ne “6 prompt kérdés sorozatban 3 pontban” legyen, hanem “három prompttípusból álló, összesen hat promptot tartalmazó beszélgetési szál”.</li>
+    </ul>
+
+    <h2>4. Gyakorlati munkasorrend</h2>
+    <ol>
+      <li>Vedd ki a <span class="mono">Kérdések</span> blokkot a mellékletből.</li>
+      <li>Tedd be <span class="mono">2.1.1. Kutatási kérdések</span> cím alá.</li>
+      <li>Írj 1-1 rövid átkötő mondatot a <span class="mono">2.2</span>, <span class="mono">2.3</span> és <span class="mono">2.4</span> végére.</li>
+      <li>Tisztítsd meg a <span class="mono">3.1 Keretrendszer</span> nyelvét.</li>
+      <li>A mellékleteket hagyd a végén, csak ne próbálj meg belőlük főszöveget csinálni.</li>
+    </ol>
+
+    <h2>5. Mit mond ez valójában Ádám kommentje alapján?</h2>
+    <div class="note">
+      <p><strong>Valószínű értelmezés:</strong> “Most már érthető, hogyan gyűjtjük az adatot a promptokkal. Ehhez igazítsuk hozzá a korábban megírt módszertani fejezeteket is.”</p>
+      <p class="small">Tehát: nem teljes újrarendezés, hanem főleg a 2. fejezet nyelvi és logikai ráhangolása a 3. fejezetre.</p>
+    </div>
+  </main>
+</body>
+</html>
