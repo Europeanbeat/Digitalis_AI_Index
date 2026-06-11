@@ -16,7 +16,9 @@ if (!OPENAI_API_KEY) {
   throw new Error("Missing OPENAI_API_KEY. Add it to .env");
 }
 
-const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+// maxRetries: 0 disables the SDK's own internal retry so the runChat loop
+// (MAX_API_RETRIES) stays the single retry authority.
+const openai = new OpenAI({ apiKey: OPENAI_API_KEY, maxRetries: 0 });
 
 // Purpose: build a PostgreSQL client configured for this workspace.
 // How: read the connection settings from .env and fail early if the password is
@@ -252,22 +254,47 @@ function ensureUsableCompletion(completion, answerText) {
   }
 }
 
-// Purpose: extract the web sources consulted by the model.
-// How: prefer the explicit web_search_call.action.sources list from the
-// Responses API; if absent, fall back to inline URL citations found in message
-// annotations.
+// Purpose: extract every web source the model consulted or cited.
+// How: collect action.sources from all web_search_call items (what the search
+// retrieved) and every url_citation annotation from the message content (what
+// the answer actually cites), deduplicated by URL; each entry keeps an
+// origins list ("search" / "citation") so the analysis can tell them apart.
 // Used by: runSession after every API call so sources can be saved with each
 // answer row.
 function extractWebSources(completion) {
+  const sourcesByUrl = new Map();
+
+  const addSource = (source, origin) => {
+    if (!source) {
+      return;
+    }
+
+    const key = source.url || source.title;
+
+    if (!key) {
+      return;
+    }
+
+    const existing = sourcesByUrl.get(key);
+
+    if (existing) {
+      if (!existing.origins.includes(origin)) {
+        existing.origins.push(origin);
+      }
+      return;
+    }
+
+    sourcesByUrl.set(key, { ...source, origins: [origin] });
+  };
+
   for (const outputItem of completion?.output || []) {
     if (outputItem?.type === "web_search_call") {
-      return outputItem?.action?.sources || [];
+      for (const source of outputItem?.action?.sources || []) {
+        addSource(source, "search");
+      }
+      continue;
     }
-  }
 
-  const citations = [];
-
-  for (const outputItem of completion?.output || []) {
     if (outputItem?.type !== "message") {
       continue;
     }
@@ -275,13 +302,13 @@ function extractWebSources(completion) {
     for (const contentItem of outputItem.content || []) {
       for (const annotation of contentItem?.annotations || []) {
         if (annotation?.type === "url_citation") {
-          citations.push(annotation.url_citation || annotation);
+          addSource(annotation.url_citation || annotation, "citation");
         }
       }
     }
   }
 
-  return citations;
+  return [...sourcesByUrl.values()];
 }
 
 // Purpose: turn SDK objects into plain JSON-safe data before returning them.
@@ -337,7 +364,8 @@ async function runChat(messages) {
       const code = error?.code;
       const message = error?.message || String(error);
       const retryable =
-        error?.name === "AbortError" ||
+        error instanceof OpenAI.APIUserAbortError ||
+        error instanceof OpenAI.APIConnectionError ||
         status === 408 ||
         status === 409 ||
         status === 429 ||

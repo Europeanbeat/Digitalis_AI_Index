@@ -65,7 +65,9 @@ if (!OPENAI_API_KEY) {
   throw new Error("Missing OPENAI_API_KEY. Add it to .env");
 }
 
-const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+// maxRetries: 0 disables the SDK's own internal retry so the runChat loop
+// (MAX_API_RETRIES) stays the single retry authority.
+const openai = new OpenAI({ apiKey: OPENAI_API_KEY, maxRetries: 0 });
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -134,15 +136,39 @@ function ensureUsableCompletion(completion, answerText) {
 }
 
 function extractWebSources(completion) {
+  const sourcesByUrl = new Map();
+
+  const addSource = (source, origin) => {
+    if (!source) {
+      return;
+    }
+
+    const key = source.url || source.title;
+
+    if (!key) {
+      return;
+    }
+
+    const existing = sourcesByUrl.get(key);
+
+    if (existing) {
+      if (!existing.origins.includes(origin)) {
+        existing.origins.push(origin);
+      }
+      return;
+    }
+
+    sourcesByUrl.set(key, { ...source, origins: [origin] });
+  };
+
   for (const outputItem of completion?.output || []) {
     if (outputItem?.type === "web_search_call") {
-      return outputItem?.action?.sources || [];
+      for (const source of outputItem?.action?.sources || []) {
+        addSource(source, "search");
+      }
+      continue;
     }
-  }
 
-  const citations = [];
-
-  for (const outputItem of completion?.output || []) {
     if (outputItem?.type !== "message") {
       continue;
     }
@@ -150,13 +176,13 @@ function extractWebSources(completion) {
     for (const contentItem of outputItem.content || []) {
       for (const annotation of contentItem?.annotations || []) {
         if (annotation?.type === "url_citation") {
-          citations.push(annotation.url_citation || annotation);
+          addSource(annotation.url_citation || annotation, "citation");
         }
       }
     }
   }
 
-  return citations;
+  return [...sourcesByUrl.values()];
 }
 
 function serializeError(error) {
@@ -254,7 +280,8 @@ async function runChat(promptText) {
       const status = error?.status;
       const code = error?.code;
       const retryable =
-        error?.name === "AbortError" ||
+        error instanceof OpenAI.APIUserAbortError ||
+        error instanceof OpenAI.APIConnectionError ||
         status === 408 ||
         status === 409 ||
         status === 429 ||
