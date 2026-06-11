@@ -1,4 +1,6 @@
 const {
+  MODEL_NAME,
+  PROVIDER_NAME,
   createDbClient,
   getAllProfiles,
   getInterestGroupRows,
@@ -7,6 +9,9 @@ const {
 
 const REPEAT_COUNT = Number(process.env.REPEAT_COUNT || 5);
 const SESSION_DELAY_MS = Number(process.env.SESSION_DELAY_MS || 0);
+const PROFILE_ID_FILTER = process.env.PROFILE_ID
+  ? Number(process.env.PROFILE_ID)
+  : null;
 const ESTIMATED_SECONDS_PER_SESSION = Number(
   process.env.ESTIMATED_SECONDS_PER_SESSION || 45,
 );
@@ -37,8 +42,8 @@ async function sessionAlreadyExists(
       profileId,
       interestGroupId,
       repeatIndex,
-      process.env.AI_PROVIDER || "openai",
-      process.env.OPENAI_MODEL || "gpt-4o-search-preview",
+      PROVIDER_NAME,
+      MODEL_NAME,
     ],
   );
 
@@ -58,6 +63,20 @@ async function main() {
   try {
     profiles = await getAllProfiles(dbClient);
     interestGroups = await getInterestGroupRows(dbClient);
+    if (PROFILE_ID_FILTER) {
+      profiles = profiles.filter(
+        (profileRow) => profileRow.profile_id === PROFILE_ID_FILTER,
+      );
+    }
+
+    if (!profiles.length) {
+      throw new Error(
+        PROFILE_ID_FILTER
+          ? `No profiles found for PROFILE_ID=${PROFILE_ID_FILTER}`
+          : "No profiles found.",
+      );
+    }
+
     const totalSessions = profiles.length * interestGroups.length * REPEAT_COUNT;
     const promptsPerSession = 6;
     const totalPrompts = totalSessions * promptsPerSession;
@@ -69,6 +88,9 @@ async function main() {
     let failedSessions = 0;
 
     console.log(`Profiles: ${profiles.length}`);
+    if (PROFILE_ID_FILTER) {
+      console.log(`Profile filter: ${PROFILE_ID_FILTER}`);
+    }
     console.log(`Interest groups: ${interestGroups.length}`);
     console.log(`Repeat count: ${REPEAT_COUNT}`);
     console.log(`Total sessions: ${totalSessions}`);

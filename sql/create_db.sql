@@ -106,3 +106,19 @@ CREATE TABLE comparison_prompt_results (
     sources_json JSONB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE explorer_prompt_results (
+    explorer_result_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    explorer_run_id VARCHAR(255) NOT NULL,
+    prompt_id INT NOT NULL,
+    repeat_index INT NOT NULL,
+    provider_name VARCHAR(100),
+    model_name VARCHAR(100),
+    prompt_text TEXT NOT NULL,
+    answer_text TEXT,
+    completion_id VARCHAR(255),
+    sources_json JSONB,
+    UNIQUE (explorer_run_id, prompt_id, repeat_index)
+);
+CREATE INDEX IF NOT EXISTS explorer_prompt_results_lookup_idx
+ON explorer_prompt_results (prompt_id, repeat_index, provider_name, model_name);

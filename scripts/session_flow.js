@@ -3,15 +3,14 @@ const { Client } = require("pg");
 const OpenAI = require("openai");
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 
-const MODEL_NAME = process.env.OPENAI_MODEL || "gpt-4o-search-preview";
-const PROVIDER_NAME = process.env.AI_PROVIDER || "openai";
-const REQUEST_TIMEOUT_MS = Number(process.env.REQUEST_TIMEOUT_MS || 120000);
+const MODEL_NAME = "gpt-5.5";
+const PROVIDER_NAME = "openai";
+const REQUEST_TIMEOUT_MS = Number(process.env.REQUEST_TIMEOUT_MS || 300000);
 const MAX_API_RETRIES = Number(process.env.MAX_API_RETRIES || 4);
 const RETRY_BASE_DELAY_MS = Number(process.env.RETRY_BASE_DELAY_MS || 2000);
-const OPENAI_API_KEY =
-  process.env.OPENAI_API_KEY ||
-  process.env.OpenAI_API_KEY ||
-  process.env.OpenAI_APIKey;
+const WEB_SEARCH_CONTEXT_SIZE =
+  process.env.WEB_SEARCH_CONTEXT_SIZE || "medium";
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 if (!OPENAI_API_KEY) {
   throw new Error("Missing OPENAI_API_KEY. Add it to .env");
@@ -19,21 +18,37 @@ if (!OPENAI_API_KEY) {
 
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
+// Purpose: build a PostgreSQL client configured for this workspace.
+// How: read the connection settings from .env and fail early if the password is
+// missing, because every runner/exporter depends on DB access.
+// Used by: runSession directly, and also by other scripts that import it
+// (batch runner, explorer/export helpers).
 function createDbClient() {
+  if (!process.env.PGPASSWORD) {
+    throw new Error("Missing PGPASSWORD. Add it to .env");
+  }
+
   return new Client({
     user: process.env.PGUSER || "postgres",
     host: process.env.PGHOST || "localhost",
     database: process.env.PGDATABASE || "digital_ai_index_db",
-    password:
-      process.env.PGPASSWORD || process.env.POSTGRES_PASSWORD || "Bence033",
+    password: process.env.PGPASSWORD,
     port: Number(process.env.PGPORT || 5432),
   });
 }
 
+// Purpose: pause deliberately between retries or between sessions.
+// How: wrap setTimeout in a Promise so callers can await the delay.
+// Used by: runChat retry backoff, and batch scripts may use the same pattern
+// between sessions to reduce API pressure.
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// Purpose: load the full profile table in stable order for batch iteration.
+// How: fetch every row from profiles ordered by profile_id so runs stay
+// deterministic and reproducible.
+// Used by: model_batch.js, which preloads all profiles before looping.
 async function getAllProfiles(dbClient) {
   const result = await dbClient.query(`
     SELECT *
@@ -44,16 +59,10 @@ async function getAllProfiles(dbClient) {
   return result.rows;
 }
 
-async function getInterestGroups(dbClient) {
-  const result = await dbClient.query(`
-    SELECT interest_type
-    FROM interest_groups
-    ORDER BY interest_group_id
-  `);
-
-  return result.rows.map((row) => row.interest_type);
-}
-
+// Purpose: load all interest-group identifiers and names for batch iteration.
+// How: fetch just the fields the batch loop needs: the DB id for skip/resume
+// checks and the human-readable interest_type for logging and session setup.
+// Used by: model_batch.js before it iterates through every product group.
 async function getInterestGroupRows(dbClient) {
   const result = await dbClient.query(`
     SELECT interest_group_id, interest_type
@@ -64,6 +73,12 @@ async function getInterestGroupRows(dbClient) {
   return result.rows;
 }
 
+// Purpose: resolve one profile id into the full profile row used by prompt
+// building and DB saves.
+// How: parameterized query by profile_id, then fail loudly if the id does not
+// exist instead of letting later prompt code break with undefined fields.
+// Used by: runSession, which accepts only profileId so it can run standalone
+// from both the single-session runner and the batch runner.
 async function getProfile(dbClient, profileId) {
   const result = await dbClient.query(
     "SELECT * FROM profiles WHERE profile_id = $1",
@@ -77,6 +92,13 @@ async function getProfile(dbClient, profileId) {
   return result.rows[0];
 }
 
+// Purpose: load the seasonal follow-up rows that define the 4 constraint
+// prompts for one interest group.
+// How: join travel_interests with interest_groups so each returned row already
+// contains season, travel_time_frame, interest_type and motivation; optionally
+// filter by interestType and cap the number of rows with limit.
+// Used by: runSession right after the profile is loaded, before the 4 seasonal
+// branches and the final comparison prompt are built.
 async function getTravelInterests(dbClient, options = {}) {
   const safeLimit = Number(options.limit) > 0 ? Number(options.limit) : 4;
 
@@ -126,12 +148,26 @@ async function getTravelInterests(dbClient, options = {}) {
   return result.rows;
 }
 
+// Purpose: build the opening general prompt from one profile row.
+// How: read age, gender, destination, stay length, travel_party and budget from
+// profileData, then choose "for me" for solo travel and "for us" otherwise.
+// Used by: runSession as the first prompt in every 6-prompt session.
 function buildGeneralPrompt(profileData) {
   const budget = Number(profileData.budget_per_day_eur);
+  const recommendationTarget =
+    typeof profileData.travel_party === "string" &&
+    profileData.travel_party.toLowerCase().includes("on my own")
+      ? "for me"
+      : "for us";
 
-  return `I am a ${profileData.age}-year-old ${profileData.gender}. I would like to travel to ${profileData.destination_name} for ${profileData.stay_nights} nights ${profileData.travel_party}. Could you recommend some activities and programmes in the area within a budget of max ${budget} EUR per person per day?`;
+  return `I am a ${profileData.age}-year-old ${profileData.gender}. I would like to travel to ${profileData.destination_name} for ${profileData.stay_nights} nights ${profileData.travel_party}. Could you recommend some activities and programmes in the area ${recommendationTarget} within a budget of max ${budget} EUR per person per day?`;
 }
 
+// Purpose: build one seasonal follow-up prompt for a specific interest row.
+// How: use the motivation from interest_groups plus the seasonal
+// travel_time_frame from travel_interests; fail if motivation is missing,
+// because the prompt would otherwise become semantically broken.
+// Used by: runSession inside the loop that creates the 4 seasonal branches.
 function buildConstraintPrompt(interestRow) {
   if (!interestRow.motivation) {
     throw new Error(
@@ -142,6 +178,11 @@ function buildConstraintPrompt(interestRow) {
   return `On this trip I am travelling mainly to ${interestRow.motivation}. Could you recommend 5 places in the area ${interestRow.travel_time_frame}?`;
 }
 
+// Purpose: build the final comparison prompt after the seasonal branches.
+// How: combine the destination name from the profile with the motivation from
+// the chosen interest row so the model suggests alternative lakeside
+// destinations that fit the same travel goal and budget context.
+// Used by: runSession once per session, after all follow-up branches finish.
 function buildComparisonPrompt(profileData, interestRow) {
   if (!interestRow.motivation) {
     throw new Error(
@@ -152,42 +193,120 @@ function buildComparisonPrompt(profileData, interestRow) {
   return `Besides ${profileData.destination_name}, could you recommend five other lakeside destinations in Europe where I could best ${interestRow.motivation}, and which also fit my profile and budget?`;
 }
 
+// Purpose: generate a unique session header id for one 6-prompt run.
+// How: combine profile id, interest group id, repeat index and a timestamp so
+// the saved rows can be grouped together in the DB.
+// Used by: runSession before any answer rows are written.
 function createSessionId(profileId, interestGroupId, repeatIndex) {
   return `session_${profileId}_${interestGroupId}_${repeatIndex}_${Date.now()}`;
 }
 
+// Purpose: normalize the assistant text out of the OpenAI Responses API object.
+// How: prefer output_text when present, otherwise walk the output/message/content
+// structure and concatenate textual parts in order.
+// Used by: runSession after every OpenAI call (general, 4 follow-ups,
+// comparison).
 function getAssistantText(completion) {
-  return completion.choices?.[0]?.message?.content || "(No text returned)";
-}
+  if (completion?.output_text) {
+    return completion.output_text;
+  }
 
-function extractWebSources(completion) {
-  const annotations = completion?.choices?.[0]?.message?.annotations || [];
-  const sourcesByUrl = new Map();
+  const textParts = [];
 
-  for (const annotation of annotations) {
-    if (annotation?.type !== "url_citation") {
+  for (const outputItem of completion?.output || []) {
+    if (outputItem?.type !== "message") {
       continue;
     }
 
-    const citation = annotation.url_citation;
-    const key = citation?.url || citation?.title;
-
-    if (key && !sourcesByUrl.has(key)) {
-      sourcesByUrl.set(key, citation);
+    for (const contentItem of outputItem.content || []) {
+      if (
+        (contentItem?.type === "output_text" || contentItem?.type === "text") &&
+        contentItem.text
+      ) {
+        textParts.push(contentItem.text);
+      }
     }
   }
 
-  return [...sourcesByUrl.values()];
+  return textParts.join("\n\n") || "(No text returned)";
 }
 
+// Purpose: stop the session when the API returns no usable answer text.
+// How: reject explicit incomplete responses and the sentinel empty-text case so
+// the caller can treat the session as failed instead of saving a false success.
+// Used by: runSession after each OpenAI call.
+function ensureUsableCompletion(completion, answerText) {
+  const trimmedAnswer = typeof answerText === "string" ? answerText.trim() : "";
+
+  if (completion?.status === "incomplete") {
+    const reason = completion?.incomplete_details?.reason;
+    throw new Error(
+      reason
+        ? `OpenAI returned an incomplete response: ${reason}`
+        : "OpenAI returned an incomplete response.",
+    );
+  }
+
+  if (!trimmedAnswer || trimmedAnswer === "(No text returned)") {
+    throw new Error("OpenAI returned an empty response.");
+  }
+}
+
+// Purpose: extract the web sources consulted by the model.
+// How: prefer the explicit web_search_call.action.sources list from the
+// Responses API; if absent, fall back to inline URL citations found in message
+// annotations.
+// Used by: runSession after every API call so sources can be saved with each
+// answer row.
+function extractWebSources(completion) {
+  for (const outputItem of completion?.output || []) {
+    if (outputItem?.type === "web_search_call") {
+      return outputItem?.action?.sources || [];
+    }
+  }
+
+  const citations = [];
+
+  for (const outputItem of completion?.output || []) {
+    if (outputItem?.type !== "message") {
+      continue;
+    }
+
+    for (const contentItem of outputItem.content || []) {
+      for (const annotation of contentItem?.annotations || []) {
+        if (annotation?.type === "url_citation") {
+          citations.push(annotation.url_citation || annotation);
+        }
+      }
+    }
+  }
+
+  return citations;
+}
+
+// Purpose: turn SDK objects into plain JSON-safe data before returning them.
+// How: serialize and deserialize the value so the caller gets a plain object
+// without SDK prototypes or non-serializable references.
+// Used by: runSession when it returns raw API responses in the result object.
 function toPlainJson(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
+// Purpose: copy the current message array before branching the conversation.
+// How: shallow-copy each message object so a seasonal branch or comparison
+// branch can append new messages without mutating the shared base history.
+// Used by: runSession when it creates the 4 seasonal branches and the final
+// comparison branch.
 function cloneMessages(messages) {
   return messages.map((message) => ({ ...message }));
 }
 
+// Purpose: send one prompt history to OpenAI with required web search, timeout
+// handling and retry logic.
+// How: call the Responses API, force the web_search tool, abort after the
+// configured timeout, and retry transient failures with exponential backoff.
+// Used by: runSession for the general prompt, each follow-up branch and the
+// comparison branch.
 async function runChat(messages) {
   let attempt = 0;
 
@@ -196,13 +315,18 @@ async function runChat(messages) {
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
     try {
-      return await openai.chat.completions.create(
+      return await openai.responses.create(
         {
           model: MODEL_NAME,
-          messages,
-          web_search_options: {
-            search_context_size: "low",
-          },
+          input: messages,
+          tools: [
+            {
+              type: "web_search",
+              search_context_size: WEB_SEARCH_CONTEXT_SIZE,
+            },
+          ],
+          tool_choice: "required",
+          include: ["web_search_call.action.sources"],
         },
         {
           signal: controller.signal,
@@ -241,6 +365,12 @@ async function runChat(messages) {
   }
 }
 
+// Purpose: create the session header row that marks one session as running,
+// completed or failed.
+// How: insert one row into session_runs using the profile id, interest group
+// id, repeat index and model/provider metadata.
+// Used by: runSession at start, and also in the failure path when a session
+// must be recorded as failed.
 async function saveSessionRun(
   dbClient,
   profileData,
@@ -278,6 +408,9 @@ async function saveSessionRun(
   );
 }
 
+// Purpose: update the status of an existing session header row.
+// How: set status and error_message on session_runs for a known session_id.
+// Used by: runSession when a transaction finishes successfully.
 async function updateSessionRunStatus(dbClient, sessionId, status, errorMessage = null) {
   await dbClient.query(
     `
@@ -290,6 +423,10 @@ async function updateSessionRunStatus(dbClient, sessionId, status, errorMessage 
   );
 }
 
+// Purpose: persist the first answer in a session, the general prompt answer.
+// How: insert the prompt text, answer text, completion id and extracted source
+// list into general_prompt_answers.
+// Used by: runSession immediately after the first OpenAI response returns.
 async function saveGeneralPromptAnswer(
   dbClient,
   profileData,
@@ -330,6 +467,10 @@ async function saveGeneralPromptAnswer(
   );
 }
 
+// Purpose: persist one of the 4 seasonal follow-up answers.
+// How: insert both profile-level context and the specific seasonal interest row
+// fields so each saved row is fully analyzable on its own.
+// Used by: runSession inside the follow-up loop, once per seasonal branch.
 async function saveConstraintPromptAnswer(
   dbClient,
   profileData,
@@ -381,6 +522,10 @@ async function saveConstraintPromptAnswer(
   );
 }
 
+// Purpose: persist the final comparison answer for the session.
+// How: insert the comparison prompt, answer, completion id and sources into the
+// dedicated comparison_prompt_results table.
+// Used by: runSession once, after the seasonal follow-ups complete.
 async function saveComparisonPromptAnswer(
   dbClient,
   profileData,
@@ -426,6 +571,11 @@ async function saveComparisonPromptAnswer(
   );
 }
 
+// Purpose: keep a lightweight in-memory trace of how the conversation branches
+// evolved.
+// How: store a label, current message count and current role sequence each time
+// the session appends a meaningful prompt or answer.
+// Used by: runSession only; the trace is returned to the caller for debugging.
 function addTrace(trace, label, messages) {
   trace.push({
     label,
@@ -434,6 +584,13 @@ function addTrace(trace, label, messages) {
   });
 }
 
+// Purpose: execute one complete experimental session: 1 general prompt,
+// 4 seasonal follow-ups and 1 comparison prompt.
+// How: load the profile and seasonal interest rows, start a DB transaction,
+// build prompts, call OpenAI sequentially, save every answer, then commit on
+// success or roll back and mark failure on error.
+// Used by: main.js for one-off runs and model_batch.js for the large
+// experiment loops.
 async function runSession(options = {}) {
   const profileId = Number(options.profileId || 1);
   const followUpLimit = Number(options.followUpLimit || 4);
@@ -492,6 +649,7 @@ async function runSession(options = {}) {
 
     const generalCompletion = await runChat(messages);
     const generalAnswer = getAssistantText(generalCompletion);
+    ensureUsableCompletion(generalCompletion, generalAnswer);
     const generalSources = extractWebSources(generalCompletion);
     messages.push({ role: "assistant", content: generalAnswer });
     addTrace(trace, "General answer appended", messages);
@@ -528,6 +686,7 @@ async function runSession(options = {}) {
 
       const completion = await runChat(branchMessages);
       const answer = getAssistantText(completion);
+      ensureUsableCompletion(completion, answer);
       const sources = extractWebSources(completion);
       branchMessages.push({ role: "assistant", content: answer });
       addTrace(
@@ -577,6 +736,7 @@ async function runSession(options = {}) {
 
       const completion = await runChat(comparisonMessages);
       const answer = getAssistantText(completion);
+      ensureUsableCompletion(completion, answer);
       const sources = extractWebSources(completion);
       comparisonMessages.push({ role: "assistant", content: answer });
       addTrace(trace, "Comparison branch answer appended", comparisonMessages);
@@ -674,9 +834,10 @@ async function runSession(options = {}) {
 }
 
 module.exports = {
+  MODEL_NAME,
+  PROVIDER_NAME,
   createDbClient,
   getAllProfiles,
-  getInterestGroups,
   getInterestGroupRows,
   runSession,
 };

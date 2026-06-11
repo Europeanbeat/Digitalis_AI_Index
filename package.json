@@ -1,10 +1,13 @@
 {
   "scripts": {
     "main": "node scripts/main.js",
-    "batch": "node scripts/model_batch.js"
+    "batch": "node scripts/model_batch.js",
+    "export:excel": "node scripts/export_db_to_excel.js",
+    "explorer:batch": "node scripts/explorer_batch.js"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
+    "exceljs": "^4.4.0",
     "openai": "^6.34.0",
     "pg": "^8.20.0"
   }
