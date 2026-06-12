@@ -10,6 +10,13 @@ const MAX_API_RETRIES = Number(process.env.MAX_API_RETRIES || 4);
 const RETRY_BASE_DELAY_MS = Number(process.env.RETRY_BASE_DELAY_MS || 2000);
 const WEB_SEARCH_CONTEXT_SIZE =
   process.env.WEB_SEARCH_CONTEXT_SIZE || "medium";
+// MAX_TOOL_CALLS=0 removes the cap entirely (no-cap control runs).
+const MAX_TOOL_CALLS = Number(process.env.MAX_TOOL_CALLS ?? 10);
+// Geographic anchor: without it the served default is country=US (verified
+// from stored response objects). One fixed anchor across every session.
+const USER_LOCATION_COUNTRY = process.env.USER_LOCATION_COUNTRY || "DE";
+const USER_LOCATION_TIMEZONE =
+  process.env.USER_LOCATION_TIMEZONE || "Europe/Berlin";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 if (!OPENAI_API_KEY) {
@@ -342,7 +349,7 @@ async function runChat(messages) {
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
     try {
-      return await openai.responses.create(
+      const response = await openai.responses.create(
         {
           model: MODEL_NAME,
           input: messages,
@@ -350,15 +357,30 @@ async function runChat(messages) {
             {
               type: "web_search",
               search_context_size: WEB_SEARCH_CONTEXT_SIZE,
+              user_location: {
+                type: "approximate",
+                country: USER_LOCATION_COUNTRY,
+                timezone: USER_LOCATION_TIMEZONE,
+              },
             },
           ],
           tool_choice: "required",
+          ...(MAX_TOOL_CALLS > 0 ? { max_tool_calls: MAX_TOOL_CALLS } : {}),
           include: ["web_search_call.action.sources"],
         },
         {
           signal: controller.signal,
         },
       );
+
+      const searchCount = (response.output || []).filter(
+        (item) => item?.type === "web_search_call",
+      ).length;
+      console.log(
+        `    web searches used: ${searchCount}${MAX_TOOL_CALLS > 0 ? ` (cap ${MAX_TOOL_CALLS})` : " (no cap)"}`,
+      );
+
+      return response;
     } catch (error) {
       const status = error?.status;
       const code = error?.code;
