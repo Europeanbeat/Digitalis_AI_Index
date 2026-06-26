@@ -59,7 +59,7 @@ The explorer prompts are:
 
 - broader
 - not tied to a traveler profile
-- not tied to the 7 thematic interest groups
+- not tied to the thematic interest groups
 - not tied to the 4 seasonal follow-up branches
 - asked as separate standalone prompts
 
@@ -188,7 +188,7 @@ That means the session is the main observational unit of the study.
 Inside that one unit:
 
 - the general prompt establishes the traveler and destination context
-- the seasonal prompts test the same travel motivation under four seasonal frames
+- the seasonal prompts test the same thematic goal under four seasonal frames, with optional season-specific wording
 - the comparison prompt tests which competing destinations the model surfaces for the same profile context
 
 So the pipeline is not just generating text. It is generating a structured set of comparable observations.
@@ -248,12 +248,12 @@ For the current structure this becomes:
 The current main design is:
 
 - `12 profiles`
-- `7 interest groups`
+- `8 interest groups`
 - `5 repeats`
 
 So:
 
-- `12 × 7 × 5 = 420 sessions`
+- `12 × 8 × 5 = 480 sessions`
 
 And because:
 
@@ -261,19 +261,19 @@ And because:
 
 the full prompt count for **one destination, one model** is:
 
-- `420 × 6 = 2520 prompts`
+- `480 × 6 = 2880 prompts`
 
 ### One destination, three models
 
 If the same destination is pulled with three model families, then:
 
-- `2520 × 3 = 7560 prompts`
+- `2880 × 3 = 8640 prompts`
 
 ### Eight destinations, three models
 
 If the same design is repeated for eight destinations:
 
-- `7560 × 8 = 60,480 prompts`
+- `8640 × 8 = 69,120 prompts`
 
 ### Storage formulas
 
@@ -290,14 +290,14 @@ So:
 
 For one destination / one model:
 
-- `420 completed sessions × 7 rows = 2940 total DB rows`
+- `480 completed sessions × 7 rows = 3360 total DB rows`
 
 Broken down:
 
-- `420` session header rows
-- `420` general answer rows
-- `1680` constraint answer rows
-- `420` comparison answer rows
+- `480` session header rows
+- `480` general answer rows
+- `1920` constraint answer rows
+- `480` comparison answer rows
 
 ## How Repetition Works
 
@@ -322,7 +322,7 @@ The precise methodological statement is:
 This structure keeps the experiment internally consistent:
 
 - the same profile logic is reused
-- the same 7 thematic groups are reused
+- the same thematic groups are reused
 - the same 4 seasonal variants are reused
 - the same comparison logic is reused
 
@@ -365,7 +365,7 @@ Built from the profile row:
 
 Built from:
 
-- thematic motivation
+- group-level thematic motivation, with optional seasonal override
 - seasonal travel time frame
 
 ### Comparison prompt
@@ -732,9 +732,9 @@ So for one session:
 
 And for one destination / one model:
 
-- `2520` answer texts
-- `2520` completion ids
-- `2520` source lists
+- `2880` answer texts
+- `2880` completion ids
+- `2880` source lists
 
 ### What is saved to the database
 
@@ -785,10 +785,10 @@ So:
 
 For the full main run of one destination / one model:
 
-- `420 session header rows`
-- `420 general answer rows`
-- `1680 constraint answer rows`
-- `420 comparison answer rows`
+- `480 session header rows`
+- `480 general answer rows`
+- `1920 constraint answer rows`
+- `480 comparison answer rows`
 
 ## Database Schema
 
@@ -797,8 +797,8 @@ The schema has two groups of tables.
 **Reference / input tables** (define the experiment grid):
 
 - **`profiles`** — the 12 traveler personas. Drives the general (L1) prompt; the focal destination is stored here (`destination_name`).
-- **`interest_groups`** — the 7 thematic product groups. Each has a `motivation` phrase used in the L2/L3 prompts.
-- **`travel_interests`** — the 4 seasonal rows per group (`season_name`, `travel_time_frame`).
+- **`interest_groups`** — the 8 thematic product groups. Each has a group-level `motivation` phrase used in the L3 prompt and as the default L2 fallback.
+- **`travel_interests`** — the 4 seasonal rows per group (`season_name`, `travel_time_frame`) plus an optional seasonal `motivation` override for L2 prompts.
 
 **Result / output tables** (the collected data):
 
@@ -847,15 +847,13 @@ erDiagram
     interest_groups {
         int interest_group_id PK
         varchar interest_type
-        text interest_attributes
         text motivation
     }
     travel_interests {
         int interest_id PK
         int interest_group_id FK
-        varchar interest_type
-        text interest_attributes
         varchar season_name
+        text motivation
         varchar travel_time_frame
     }
     session_runs {
@@ -1052,10 +1050,10 @@ Meaning:
 Current one-destination / one-model baseline:
 
 - `12` profiles
-- `7` groups
+- `8` groups
 - `5` repeats
-- `420` sessions
-- `2520` prompts
+- `480` sessions
+- `2880` prompts
 
 Recommended command:
 
@@ -1067,10 +1065,10 @@ caffeinate -dimsu env REPEAT_COUNT=5 SESSION_DELAY_MS=750 REQUEST_TIMEOUT_MS=300
 Expected startup values:
 
 - `Profiles: 12`
-- `Interest groups: 7`
+- `Interest groups: 8`
 - `Repeat count: 5`
-- `Total sessions: 420`
-- `Total prompts for this model: 2520`
+- `Total sessions: 480`
+- `Total prompts for this model: 2880`
 
 ### Run the explorer prompts
 
@@ -1125,14 +1123,14 @@ The current repository is pinned to `gpt-5.5`, but the math does not change when
 
 If the session structure stays the same, then for each additional model:
 
-- `+420 sessions per destination`
-- `+2520 prompts per destination`
+- `+480 sessions per destination`
+- `+2880 prompts per destination`
 
 So the model dimension scales linearly:
 
-- `total prompts = destinations × models × 2520`
+- `total prompts = destinations × models × 2880`
 
-for the current `12 × 7 × 5 × 6` design.
+for the current `12 × 8 × 5 × 6` design.
 
 ## Limitations and Caveats
 
@@ -1162,9 +1160,9 @@ This is a research data-collection pipeline. The following are known and worth s
 
 If you only need the essential math:
 
-- `12 profiles × 7 groups × 5 repeats = 420 sessions`
-- `420 sessions × 6 prompts = 2520 prompts per destination per model`
-- `2520 × 3 models = 7560 prompts per destination`
-- `7560 × 8 destinations = 60,480 prompts`
+- `12 profiles × 8 groups × 5 repeats = 480 sessions`
+- `480 sessions × 6 prompts = 2880 prompts per destination per model`
+- `2880 × 3 models = 8640 prompts per destination`
+- `8640 × 8 destinations = 69,120 prompts`
 
 That is the core experimental scale of the project.

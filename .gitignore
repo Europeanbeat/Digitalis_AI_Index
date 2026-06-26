@@ -6,3 +6,5 @@ node_modules/
 obsidian/
 outputs/
 *.zip
+docs/reference_inputs/
+docs/notes/CONVERSATION_LOG.md

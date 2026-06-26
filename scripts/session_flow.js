@@ -8,8 +8,14 @@ const PROVIDER_NAME = "openai";
 const REQUEST_TIMEOUT_MS = Number(process.env.REQUEST_TIMEOUT_MS || 300000);
 const MAX_API_RETRIES = Number(process.env.MAX_API_RETRIES || 4);
 const RETRY_BASE_DELAY_MS = Number(process.env.RETRY_BASE_DELAY_MS || 2000);
+const MAX_TOOL_CALLS = Number(process.env.MAX_TOOL_CALLS || 6);
+const REASONING_EFFORT = process.env.REASONING_EFFORT || "low";
+const TEXT_VERBOSITY = process.env.TEXT_VERBOSITY || "medium";
 const WEB_SEARCH_CONTEXT_SIZE =
-  process.env.WEB_SEARCH_CONTEXT_SIZE || "medium";
+  process.env.WEB_SEARCH_CONTEXT_SIZE || "low";
+const WEB_SEARCH_COUNTRY = process.env.WEB_SEARCH_COUNTRY || "DE";
+const WEB_SEARCH_TIMEZONE =
+  process.env.WEB_SEARCH_TIMEZONE || "Europe/Berlin";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 if (!OPENAI_API_KEY) {
@@ -19,6 +25,18 @@ if (!OPENAI_API_KEY) {
 // maxRetries: 0 disables the SDK's own internal retry so the runChat loop
 // (MAX_API_RETRIES) stays the single retry authority.
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY, maxRetries: 0 });
+
+function buildWebSearchTool() {
+  return {
+    type: "web_search",
+    search_context_size: WEB_SEARCH_CONTEXT_SIZE,
+    user_location: {
+      type: "approximate",
+      country: WEB_SEARCH_COUNTRY,
+      timezone: WEB_SEARCH_TIMEZONE,
+    },
+  };
+}
 
 // Purpose: build a PostgreSQL client configured for this workspace.
 // How: read the connection settings from .env and fail early if the password is
@@ -97,8 +115,9 @@ async function getProfile(dbClient, profileId) {
 // Purpose: load the seasonal follow-up rows that define the 4 constraint
 // prompts for one interest group.
 // How: join travel_interests with interest_groups so each returned row already
-// contains season, travel_time_frame, interest_type and motivation; optionally
-// filter by interestType and cap the number of rows with limit.
+// contains season, travel_time_frame, interest_type, the group-level
+// motivation and the optional seasonal motivation override; optionally filter
+// by interestType and cap the number of rows with limit.
 // Used by: runSession right after the profile is loaded, before the 4 seasonal
 // branches and the final comparison prompt are built.
 async function getTravelInterests(dbClient, options = {}) {
@@ -111,8 +130,8 @@ async function getTravelInterests(dbClient, options = {}) {
           ti.interest_id,
           ti.interest_group_id,
           ig.interest_type,
-          ig.interest_attributes,
-          ig.motivation,
+          ig.motivation AS group_motivation,
+          ti.motivation AS seasonal_motivation,
           ti.season_name,
           ti.travel_time_frame
         FROM travel_interests ti
@@ -134,8 +153,8 @@ async function getTravelInterests(dbClient, options = {}) {
         ti.interest_id,
         ti.interest_group_id,
         ig.interest_type,
-        ig.interest_attributes,
-        ig.motivation,
+        ig.motivation AS group_motivation,
+        ti.motivation AS seasonal_motivation,
         ti.season_name,
         ti.travel_time_frame
       FROM travel_interests ti
@@ -165,19 +184,25 @@ function buildGeneralPrompt(profileData) {
   return `I am a ${profileData.age}-year-old ${profileData.gender}. I would like to travel to ${profileData.destination_name} for ${profileData.stay_nights} nights ${profileData.travel_party}. Could you recommend some activities and programmes in the area ${recommendationTarget} within a budget of max ${budget} EUR per person per day?`;
 }
 
+function getConstraintMotivation(interestRow) {
+  return interestRow.seasonal_motivation || interestRow.group_motivation;
+}
+
 // Purpose: build one seasonal follow-up prompt for a specific interest row.
-// How: use the motivation from interest_groups plus the seasonal
-// travel_time_frame from travel_interests; fail if motivation is missing,
-// because the prompt would otherwise become semantically broken.
+// How: use the seasonal L2 motivation when present, otherwise fall back to the
+// group-level motivation; fail if both are missing, because the prompt would
+// otherwise become semantically broken.
 // Used by: runSession inside the loop that creates the 4 seasonal branches.
 function buildConstraintPrompt(interestRow) {
-  if (!interestRow.motivation) {
+  const motivation = getConstraintMotivation(interestRow);
+
+  if (!motivation) {
     throw new Error(
-      `Missing motivation for interest_group_id=${interestRow.interest_group_id}`,
+      `Missing constraint motivation for interest_group_id=${interestRow.interest_group_id}`,
     );
   }
 
-  return `On this trip I am travelling mainly to ${interestRow.motivation}. Could you recommend 5 places in the area ${interestRow.travel_time_frame}?`;
+  return `On this trip I am travelling mainly to ${motivation}. Could you recommend 5 places in the area ${interestRow.travel_time_frame}?`;
 }
 
 // Purpose: build the final comparison prompt after the seasonal branches.
@@ -186,13 +211,13 @@ function buildConstraintPrompt(interestRow) {
 // destinations that fit the same travel goal and budget context.
 // Used by: runSession once per session, after all follow-up branches finish.
 function buildComparisonPrompt(profileData, interestRow) {
-  if (!interestRow.motivation) {
+  if (!interestRow.group_motivation) {
     throw new Error(
-      `Missing motivation for interest_group_id=${interestRow.interest_group_id}`,
+      `Missing group motivation for interest_group_id=${interestRow.interest_group_id}`,
     );
   }
 
-  return `Besides ${profileData.destination_name}, could you recommend five other lakeside destinations in Europe where I could best ${interestRow.motivation}, and which also fit my profile and budget?`;
+  return `Besides ${profileData.destination_name}, could you recommend five other lakeside destinations in Europe where I could best ${interestRow.group_motivation}, and which also fit my profile and budget?`;
 }
 
 // Purpose: generate a unique session header id for one 6-prompt run.
@@ -346,13 +371,11 @@ async function runChat(messages) {
         {
           model: MODEL_NAME,
           input: messages,
-          tools: [
-            {
-              type: "web_search",
-              search_context_size: WEB_SEARCH_CONTEXT_SIZE,
-            },
-          ],
+          tools: [buildWebSearchTool()],
           tool_choice: "required",
+          max_tool_calls: MAX_TOOL_CALLS,
+          reasoning: { effort: REASONING_EFFORT },
+          text: { verbosity: TEXT_VERBOSITY },
           include: ["web_search_call.action.sources"],
         },
         {

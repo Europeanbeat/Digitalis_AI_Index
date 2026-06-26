@@ -10,12 +10,30 @@ const REQUEST_TIMEOUT_MS = Number(process.env.REQUEST_TIMEOUT_MS || 300000);
 const MAX_API_RETRIES = Number(process.env.MAX_API_RETRIES || 4);
 const RETRY_BASE_DELAY_MS = Number(process.env.RETRY_BASE_DELAY_MS || 2000);
 const SESSION_DELAY_MS = Number(process.env.SESSION_DELAY_MS || 0);
+const MAX_TOOL_CALLS = Number(process.env.MAX_TOOL_CALLS || 6);
+const REASONING_EFFORT = process.env.REASONING_EFFORT || "low";
+const TEXT_VERBOSITY = process.env.TEXT_VERBOSITY || "medium";
 const WEB_SEARCH_CONTEXT_SIZE =
-  process.env.WEB_SEARCH_CONTEXT_SIZE || "medium";
+  process.env.WEB_SEARCH_CONTEXT_SIZE || "low";
+const WEB_SEARCH_COUNTRY = process.env.WEB_SEARCH_COUNTRY || "DE";
+const WEB_SEARCH_TIMEZONE =
+  process.env.WEB_SEARCH_TIMEZONE || "Europe/Berlin";
 const REPEAT_COUNT = Number(process.env.REPEAT_COUNT || 5);
 const PROMPT_LIMIT = Number(process.env.PROMPT_LIMIT || 0);
 const OUTPUT_DIR = path.join(__dirname, "..", "outputs");
 const DOCUMENTED_PROMPT_COUNT = 9;
+
+function buildWebSearchTool() {
+  return {
+    type: "web_search",
+    search_context_size: WEB_SEARCH_CONTEXT_SIZE,
+    user_location: {
+      type: "approximate",
+      country: WEB_SEARCH_COUNTRY,
+      timezone: WEB_SEARCH_TIMEZONE,
+    },
+  };
+}
 
 const EXPLORER_PROMPTS = [
   {
@@ -263,13 +281,11 @@ async function runChat(promptText) {
         {
           model: MODEL_NAME,
           input: [{ role: "user", content: promptText }],
-          tools: [
-            {
-              type: "web_search",
-              search_context_size: WEB_SEARCH_CONTEXT_SIZE,
-            },
-          ],
+          tools: [buildWebSearchTool()],
           tool_choice: "required",
+          max_tool_calls: MAX_TOOL_CALLS,
+          reasoning: { effort: REASONING_EFFORT },
+          text: { verbosity: TEXT_VERBOSITY },
           include: ["web_search_call.action.sources"],
         },
         {
@@ -322,13 +338,17 @@ Environment variables:
   Model is fixed to gpt-5.5
   REPEAT_COUNT              defaults to 5
   PROMPT_LIMIT              optional, run only the first N prompts
-  WEB_SEARCH_CONTEXT_SIZE   defaults to medium
+  MAX_TOOL_CALLS            defaults to 6
+  REASONING_EFFORT          defaults to low
+  TEXT_VERBOSITY            defaults to medium
+  WEB_SEARCH_CONTEXT_SIZE   defaults to low
   SESSION_DELAY_MS          defaults to 0
   OUTPUT_FILE               optional custom JSON path
 
 Example:
   REPEAT_COUNT=5 node scripts/explorer_batch.js --save
-  REPEAT_COUNT=1 PROMPT_LIMIT=2 WEB_SEARCH_CONTEXT_SIZE=medium node scripts/explorer_batch.js
+  REPEAT_COUNT=1 PROMPT_LIMIT=2 WEB_SEARCH_CONTEXT_SIZE=low node scripts/explorer_batch.js
+  REPEAT_COUNT=1 PROMPT_LIMIT=2 MAX_TOOL_CALLS=6 REASONING_EFFORT=low TEXT_VERBOSITY=medium WEB_SEARCH_CONTEXT_SIZE=low node scripts/explorer_batch.js
 `);
 }
 
@@ -380,6 +400,9 @@ async function main() {
 
     console.log(`Model: ${MODEL_NAME}`);
     console.log(`Web search context: ${WEB_SEARCH_CONTEXT_SIZE}`);
+    console.log(`Max tool calls: ${MAX_TOOL_CALLS}`);
+    console.log(`Reasoning effort: ${REASONING_EFFORT}`);
+    console.log(`Text verbosity: ${TEXT_VERBOSITY}`);
     console.log(`Save to DB: ${saveToDb ? "yes" : "no"}`);
     console.log(`Prompt count: ${prompts.length}`);
     console.log(`Repeat count: ${REPEAT_COUNT}`);

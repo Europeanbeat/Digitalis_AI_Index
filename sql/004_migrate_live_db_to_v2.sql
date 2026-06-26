@@ -4,35 +4,38 @@
 -- 2. link seasonal travel_interests rows to a stable interest_group_id
 -- 3. introduce session_runs
 -- 4. add metadata fields needed by the updated session_flow.js
+-- Follow-up cleanup / extensions live in later scripts:
+--   006_remove_interest_attributes.sql
+--   007_add_waterfront_recreation.sql
 
 
 -- 1. Stable product-group table
 CREATE TABLE IF NOT EXISTS interest_groups (
     interest_group_id INT PRIMARY KEY,
     interest_type VARCHAR(255) NOT NULL UNIQUE,
-    interest_attributes TEXT,
     motivation TEXT
 );
 
 ALTER TABLE interest_groups
 ADD COLUMN IF NOT EXISTS motivation TEXT;
 
+ALTER TABLE interest_groups
+DROP COLUMN IF EXISTS interest_attributes;
+
 INSERT INTO interest_groups (
     interest_group_id,
     interest_type,
-    interest_attributes,
     motivation
 ) VALUES
-    (1, 'Wellness', 'massage salons, sauna world, relaxation, and spa hotels', 'relax, unwind and recharge through wellness and spa experiences'),
-    (2, 'Gastronomy', 'wineries, farmers markets, fine dining, and local specialties', 'experience local food, wine and culinary traditions'),
-    (3, 'Active tourism', 'cycling, sailing, hiking trails, and water sports', 'be physically active and enjoy outdoor sport and adventure'),
-    (4, 'Health tourism', 'thermal water, medical rehabilitation, healing treatments, and physiotherapy', 'improve my health and recovery through medical, thermal or healing treatments'),
-    (5, 'Culture and events', 'castles, festivals, museums, historical landmarks, and churches', 'discover culture, heritage, history and local events'),
-    (6, 'Nature and ecotourism', 'national parks, nature trails, birdwatching, untouched landscapes, and camping', 'connect with nature, scenery and the outdoors'),
-    (7, 'Agritourism', 'farm stays, grape harvest experiences, craft workshops, and rural lifestyle activities', 'experience authentic rural life and local farming')
+    (1, 'Wellness', 'relax, unwind and recharge through wellness and spa experiences'),
+    (2, 'Gastronomy', 'experience local food, wine and culinary traditions'),
+    (3, 'Active tourism', 'be physically active and enjoy outdoor sport and adventure'),
+    (4, 'Health tourism', 'improve my health and recovery through medical, thermal or healing treatments'),
+    (5, 'Culture and events', 'discover culture, heritage, history and local events'),
+    (6, 'Nature and ecotourism', 'connect with nature, scenery and the outdoors'),
+    (7, 'Agritourism', 'experience authentic rural life and local farming')
 ON CONFLICT (interest_group_id) DO UPDATE SET
     interest_type = EXCLUDED.interest_type,
-    interest_attributes = EXCLUDED.interest_attributes,
     motivation = EXCLUDED.motivation;
 
 
@@ -140,6 +143,9 @@ WHERE provider_name IS NULL;
 ALTER TABLE general_prompt_answers
 ALTER COLUMN repeat_index SET DEFAULT 1;
 
+CREATE UNIQUE INDEX IF NOT EXISTS general_prompt_answers_session_unique_idx
+ON general_prompt_answers (session_id);
+
 
 -- 5. Constraint prompt answer metadata and stable group reference
 ALTER TABLE constraint_prompt_answers
@@ -180,6 +186,9 @@ WHERE provider_name IS NULL;
 ALTER TABLE constraint_prompt_answers
 ALTER COLUMN repeat_index SET DEFAULT 1;
 
+CREATE UNIQUE INDEX IF NOT EXISTS constraint_prompt_answers_session_interest_unique_idx
+ON constraint_prompt_answers (session_id, interest_id);
+
 
 -- 6. Comparison prompt answer metadata and stable group reference
 ALTER TABLE comparison_prompt_results
@@ -218,7 +227,13 @@ SET provider_name = 'openai'
 WHERE provider_name IS NULL;
 
 ALTER TABLE comparison_prompt_results
+ADD COLUMN IF NOT EXISTS provider_name VARCHAR(100);
+
+ALTER TABLE comparison_prompt_results
 ALTER COLUMN repeat_index SET DEFAULT 1;
+
+CREATE UNIQUE INDEX IF NOT EXISTS comparison_prompt_results_session_unique_idx
+ON comparison_prompt_results (session_id);
 
 ALTER TABLE comparison_prompt_results
 ALTER COLUMN interest_id DROP NOT NULL;

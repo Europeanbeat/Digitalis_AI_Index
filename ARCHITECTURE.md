@@ -183,13 +183,14 @@ erDiagram
     interest_groups {
         int interest_group_id PK
         varchar interest_type UK
-        text interest_attributes
+        text motivation
     }
 
     travel_interests {
         int interest_id PK
         int interest_group_id FK
         varchar season_name
+        text motivation
         varchar travel_time_frame
     }
 

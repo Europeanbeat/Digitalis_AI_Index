@@ -1,5 +1,5 @@
 -- Aligns the live DB with "AI_Visibility_prompt_library_motivacio_v2.xlsx".
--- 1. adds a motivation phrase per thematic group (used by L2 + L3 prompts)
+-- 1. adds a motivation phrase per thematic group (used by L3 and as the default L2 fallback)
 -- 2. replaces the profiles with the 12 motivation-library FLC profiles (Lake Balaton)
 
 -- 1. Motivation phrase per product group --------------------------------------
@@ -13,6 +13,7 @@ UPDATE interest_groups SET motivation = 'improve my health and recovery through 
 UPDATE interest_groups SET motivation = 'discover culture, heritage, history and local events'                  WHERE interest_group_id = 5; -- Culture and events
 UPDATE interest_groups SET motivation = 'connect with nature, scenery and the outdoors'                         WHERE interest_group_id = 6; -- Nature and ecotourism
 UPDATE interest_groups SET motivation = 'experience authentic rural life and local farming'                     WHERE interest_group_id = 7; -- Agritourism
+UPDATE interest_groups SET motivation = 'enjoy the lakeshore, beaches and waterfront recreation'                WHERE interest_group_id = 8; -- Waterfront recreation / beach
 
 -- 2. The 12 motivation-library profiles (all anchored to Lake Balaton) ---------
 -- travel_party stores the final prompt-ready English phrase used directly in the template literal.

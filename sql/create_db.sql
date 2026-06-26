@@ -15,7 +15,6 @@ CREATE TABLE profiles (
 CREATE TABLE interest_groups (
     interest_group_id INT PRIMARY KEY, -- fő termékcsoport azonosító
     interest_type VARCHAR(255) NOT NULL UNIQUE, -- pl. Wellness, Gastronomy
-    interest_attributes TEXT, -- a csoporthoz tartozó tipikus preferenciák
     motivation TEXT -- v2 prompt logika szerinti utazási motivációs kifejezés
 );
 
@@ -24,6 +23,7 @@ CREATE TABLE travel_interests (
     interest_id INT PRIMARY KEY, -- szezonális variáns azonosító
     interest_group_id INT NOT NULL REFERENCES interest_groups(interest_group_id),
     season_name VARCHAR(100) NOT NULL, -- pl. Summer, Autumn, Winter, Spring
+    motivation TEXT, -- szezonális L2 motiváció; ha NULL, a csoportszintű motivation az alapértelmezés
     travel_time_frame VARCHAR(255) NOT NULL, -- pl. "between June and August"
     UNIQUE (interest_group_id, season_name)
 );
@@ -67,6 +67,8 @@ CREATE TABLE general_prompt_answers (
     sources_json JSONB, -- a web source lista nyers JSON formában
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE UNIQUE INDEX IF NOT EXISTS general_prompt_answers_session_unique_idx
+ON general_prompt_answers (session_id);
 
 
 CREATE TABLE constraint_prompt_answers (
@@ -88,6 +90,8 @@ CREATE TABLE constraint_prompt_answers (
     sources_json JSONB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE UNIQUE INDEX IF NOT EXISTS constraint_prompt_answers_session_interest_unique_idx
+ON constraint_prompt_answers (session_id, interest_id);
 
 
 CREATE TABLE comparison_prompt_results (
@@ -106,6 +110,8 @@ CREATE TABLE comparison_prompt_results (
     sources_json JSONB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE UNIQUE INDEX IF NOT EXISTS comparison_prompt_results_session_unique_idx
+ON comparison_prompt_results (session_id);
 
 CREATE TABLE explorer_prompt_results (
     explorer_result_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
