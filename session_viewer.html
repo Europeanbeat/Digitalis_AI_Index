@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Session Viewer</title>
+  <style>
+    :root {
+      --bg: #f5efe6;
+      --panel: rgba(255, 250, 244, 0.92);
+      --panel-strong: #fffdf8;
+      --ink: #1f1a17;
+      --muted: #74685f;
+      --line: rgba(68, 46, 32, 0.14);
+      --accent: #9e4f2f;
+      --accent-soft: #f3d8c9;
+      --user: #f4e3d3;
+      --assistant: #fffdf9;
+      --danger: #b84a3a;
+      --ok: #3f6f4d;
+      --shadow: 0 18px 50px rgba(82, 51, 36, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top left, rgba(235, 197, 174, 0.62), transparent 34%),
+        radial-gradient(circle at top right, rgba(205, 221, 199, 0.55), transparent 32%),
+        linear-gradient(180deg, #faf6f1 0%, var(--bg) 100%);
+      color: var(--ink);
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+    }
+
+    .shell {
+      height: 100vh;
+      padding: 18px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      min-height: 0;
+    }
+
+    .sidebar {
+      display: grid;
+      grid-template-rows: auto auto auto minmax(0, 1fr);
+      overflow: hidden;
+      height: calc(100vh - 36px);
+    }
+
+    .hero,
+    .filters,
+    .list,
+    .detail {
+      padding: 20px 22px;
+    }
+
+    .hero {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.75);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 {
+      font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+
+    h1 {
+      margin-top: 16px;
+      font-size: 32px;
+      line-height: 1.02;
+    }
+
+    .hero p,
+    .meta-line,
+    .subtle,
+    .empty p,
+    .source-link {
+      color: var(--muted);
+    }
+
+    .hero p {
+      margin: 10px 0 0;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .filters {
+      display: grid;
+      gap: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    select, input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 11px 13px;
+      background: rgba(255,255,255,0.92);
+      color: var(--ink);
+      font: inherit;
+    }
+
+    .list {
+      overflow: auto;
+      display: block;
+      align-content: start;
+    }
+
+    .list-shell {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .section-shell {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .section-title-row {
+      display: grid;
+      gap: 6px;
+    }
+
+    .section-meta {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+
+    .pager {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding-bottom: 4px;
+    }
+
+    .pager-info {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .pager-controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pager-button {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.92);
+      color: var(--ink);
+      border-radius: 12px;
+      padding: 9px 12px;
+      font: inherit;
+      cursor: pointer;
+      min-width: 44px;
+    }
+
+    .pager-button:hover:not(:disabled) {
+      border-color: rgba(158, 79, 47, 0.32);
+      background: #fffdf9;
+    }
+
+    .pager-button.active {
+      background: linear-gradient(180deg, #fff7f1 0%, #fffdf8 100%);
+      border-color: rgba(158, 79, 47, 0.44);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .pager-button:disabled {
+      cursor: default;
+      opacity: 0.45;
+    }
+
+    .terminal-panel {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--line);
+      display: grid;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .terminal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .terminal-title {
+      font-size: 16px;
+      line-height: 1.1;
+    }
+
+    .terminal-meta {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+
+    .terminal-body {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #1e1713;
+      color: #efe6d9;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      line-height: 1.55;
+      padding: 14px 16px;
+      overflow: auto;
+      min-height: 170px;
+      max-height: 240px;
+      white-space: pre-wrap;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    .terminal-empty {
+      color: #bdaea0;
+    }
+
+    .terminal-entry + .terminal-entry {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .terminal-time {
+      color: #d6b798;
+    }
+
+    .terminal-status {
+      color: #a9d39d;
+    }
+
+    .terminal-status.failed {
+      color: #f4a39a;
+    }
+
+    .terminal-status.running {
+      color: #f0cf8d;
+    }
+
+    .session-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.75);
+      padding: 16px;
+      cursor: pointer;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease;
+    }
+
+    .session-card:hover {
+      transform: translateY(-1px);
+      border-color: rgba(158, 79, 47, 0.32);
+    }
+
+    .session-card.active {
+      background: linear-gradient(180deg, #fff7f1 0%, #fffdf8 100%);
+      border-color: rgba(158, 79, 47, 0.44);
+      box-shadow: inset 0 0 0 1px rgba(158, 79, 47, 0.08);
+    }
+
+    .request-table {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.75);
+    }
+
+    .request-head,
+    .request-row {
+      display: grid;
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.8fr) minmax(160px, 1fr) minmax(130px, 0.9fr);
+      align-items: stretch;
+    }
+
+    .request-head {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: rgba(52, 34, 23, 0.06);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .request-row {
+      width: 100%;
+      padding: 0;
+      border: 0;
+      border-bottom: 1px solid rgba(68, 46, 32, 0.08);
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      transition: background .15s ease;
+    }
+
+    .request-row:hover {
+      background: rgba(255,255,255,0.9);
+    }
+
+    .request-row.active {
+      background: linear-gradient(180deg, #fff7f1 0%, #fffdf8 100%);
+      box-shadow: inset 0 0 0 1px rgba(158, 79, 47, 0.12);
+    }
+
+    .request-row:last-child {
+      border-bottom: 0;
+    }
+
+    .request-header-cell,
+    .request-cell {
+      padding: 14px 16px;
+      min-width: 0;
+      border-right: 1px solid rgba(68, 46, 32, 0.08);
+    }
+
+    .request-head .request-header-cell:last-child,
+    .request-row .request-cell:last-child {
+      border-right: 0;
+    }
+
+    .request-header-cell {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .request-primary {
+      font-size: 14px;
+      line-height: 1.45;
+      color: var(--ink);
+      margin-bottom: 6px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .request-secondary {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .request-created,
+    .request-model {
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .card-top,
+    .pill-row,
+    .session-head,
+    .turn-head,
+    .turn-footer,
+    .header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .pill-row { margin-top: 10px; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .status-completed { background: rgba(111, 161, 113, 0.18); color: var(--ok); }
+    .status-failed { background: rgba(184, 74, 58, 0.16); color: var(--danger); }
+    .status-running { background: rgba(230, 169, 51, 0.16); color: #8d6304; }
+
+    .card-title {
+      font-size: 19px;
+      line-height: 1.1;
+    }
+
+    .card-subtitle,
+    .meta-line {
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .detail {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      min-height: 0;
+      overflow: hidden;
+      height: calc(100vh - 36px);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .detail-topbar {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 22px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .back-button {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.92);
+      color: var(--ink);
+      border-radius: 14px;
+      padding: 11px 14px;
+      font: inherit;
+      cursor: pointer;
+      flex: 0 0 auto;
+    }
+
+    .back-button:hover {
+      border-color: rgba(158, 79, 47, 0.32);
+      background: #fffdf9;
+    }
+
+    .detail-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      min-height: 0;
+      flex: 1 1 auto;
+      height: 100%;
+    }
+
+    .detail-main {
+      overflow: auto;
+      padding: 22px;
+    }
+
+    .detail-note {
+      margin: 0 0 18px;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .io-block {
+      display: grid;
+      gap: 16px;
+    }
+
+    .io-block + .io-block {
+      margin-top: 28px;
+    }
+
+    .section-title {
+      font-size: 34px;
+      line-height: 1;
+      margin: 0;
+    }
+
+    .entry-stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .entry-block {
+      display: grid;
+      gap: 10px;
+    }
+
+    .entry-label {
+      font-size: 13px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+
+    .entry-copy {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(255,255,255,0.82);
+      padding: 18px 20px;
+      line-height: 1.72;
+      white-space: pre-wrap;
+      box-shadow: 0 12px 24px rgba(77, 48, 34, 0.05);
+    }
+
+    .entry-copy.user {
+      background: var(--user);
+    }
+
+    .entry-copy.assistant {
+      background: var(--assistant);
+    }
+
+    .entry-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .properties-pane {
+      border-left: 1px solid var(--line);
+      overflow: auto;
+      padding: 22px;
+      background: rgba(255,255,255,0.34);
+    }
+
+    .properties-card {
+      border-style: solid;
+      background: rgba(255,255,255,0.72);
+    }
+
+    .summary-grid {
+      display: grid;
+      gap: 14px;
+      padding-top: 14px;
+    }
+
+    .summary-box {
+      border-bottom: 1px solid rgba(68, 46, 32, 0.1);
+      padding-bottom: 12px;
+    }
+
+    .summary-box:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .summary-box .k {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .summary-box .v {
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    .thread {
+      overflow: auto;
+      padding-top: 18px;
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .turn {
+      display: grid;
+      gap: 12px;
+    }
+
+    .bubble {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 16px 18px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      box-shadow: 0 12px 24px rgba(77, 48, 34, 0.05);
+    }
+
+    .bubble.user {
+      background: var(--user);
+      max-width: 86%;
+    }
+
+    .bubble.assistant {
+      background: var(--assistant);
+    }
+
+    .turn-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+
+    .turn-footer {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    details {
+      border: 1px dashed var(--line);
+      border-radius: 16px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.55);
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    ul.source-list {
+      margin: 10px 0 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 8px;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover { text-decoration: underline; }
+
+    .empty {
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 40px 22px;
+      height: 100%;
+    }
+
+    .empty h2 { font-size: 30px; }
+    .empty p { max-width: 560px; line-height: 1.6; }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      word-break: break-all;
+    }
+
+    @media (max-width: 1120px) {
+      .panel,
+      .sidebar,
+      .detail {
+        min-height: 0;
+      }
+
+      .request-head,
+      .request-row {
+        grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.4fr);
+      }
+
+      .request-head .request-header-cell:nth-child(3),
+      .request-head .request-header-cell:nth-child(4),
+      .request-row .request-cell:nth-child(3),
+      .request-row .request-cell:nth-child(4) {
+        display: none;
+      }
+
+      .detail-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .properties-pane {
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="panel sidebar" id="listView">
+      <div class="hero">
+        <div class="eyebrow">Local Research Viewer</div>
+        <h1>Live + Saved Request Logs</h1>
+        <p>Follow the active Claude requests while they are still running, then inspect the committed research rows below after the session finishes.</p>
+      </div>
+
+      <form class="filters" id="filters">
+        <div class="grid-2">
+          <label>
+            Database
+            <select id="database" name="database"></select>
+          </label>
+          <label>
+            Search
+            <input id="q" name="q" placeholder="request id, completion id, session id, prompt..." />
+          </label>
+        </div>
+      </form>
+
+      <section class="terminal-panel">
+        <div class="terminal-head">
+          <div>
+            <div class="eyebrow">Live Session Feed</div>
+            <h2 class="terminal-title">Terminal-style progress</h2>
+          </div>
+          <div class="terminal-meta" id="terminalMeta">Waiting for database…</div>
+        </div>
+
+        <div class="terminal-body" id="liveFeed">
+          <div class="terminal-empty">No live session rows yet.</div>
+        </div>
+      </section>
+
+      <div class="list" id="sessionList">
+        <div class="section-shell">
+          <section>
+            <div class="section-head">
+              <div class="section-title-row">
+                <div class="eyebrow">Live Requests</div>
+                <div class="section-meta" id="liveRequestsMeta">Waiting for live request traces…</div>
+              </div>
+            </div>
+            <div id="liveRequestsList"></div>
+          </section>
+
+          <section>
+            <div class="section-head">
+              <div class="section-title-row">
+                <div class="eyebrow">Saved Requests</div>
+                <div class="section-meta" id="savedRequestsMeta">Waiting for committed request logs…</div>
+              </div>
+            </div>
+            <div id="savedRequestsList"></div>
+          </section>
+        </div>
+      </div>
+    </aside>
+
+    <main class="panel detail hidden" id="detailView">
+      <div class="detail-topbar">
+        <button class="back-button" id="backToList">← All requests</button>
+        <div>
+          <div class="eyebrow" id="detailEyebrow">No request selected</div>
+          <h2 id="detailTitle">Pick a saved request</h2>
+          <p class="subtle" id="detailSubtitle">Open one row to inspect the exact saved thread, output, and token usage for that request.</p>
+        </div>
+      </div>
+
+      <div class="detail-layout">
+        <div class="detail-main">
+          <p class="detail-note subtle" id="detailNote">This view opens after you click a request row.</p>
+
+          <section class="io-block">
+            <h3 class="section-title">Input</h3>
+            <div class="entry-stack" id="inputPane">
+              <div class="empty">
+                <div>
+                  <h2>Choose a request</h2>
+                  <p>The saved input thread for that request will appear here.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="io-block">
+            <h3 class="section-title">Output</h3>
+            <div class="entry-stack" id="outputPane">
+              <div class="empty">
+                <div>
+                  <h2>Open a thread</h2>
+                  <p>The output, provider events, and citations will appear here after you click a request row.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <aside class="properties-pane">
+          <details class="properties-card" open>
+            <summary>Properties</summary>
+            <div class="summary-grid" id="summaryGrid"></div>
+          </details>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const REFRESH_MS = 5000;
+    const REQUESTS_PER_PAGE = 20;
+
+    const state = {
+      databases: [],
+      requests: [],
+      liveRequests: [],
+      liveFeed: [],
+      selectedDatabase: "",
+      selectedRequestLogId: "",
+      selectedLiveRequestId: "",
+      selectedDetailSource: "saved",
+      promptTarget: 6,
+      totalLiveRequests: 0,
+      currentPage: 1,
+      totalPages: 0,
+      totalRequests: 0,
+      pageSize: REQUESTS_PER_PAGE,
+    };
+
+    const els = {
+      database: document.getElementById("database"),
+      q: document.getElementById("q"),
+      terminalMeta: document.getElementById("terminalMeta"),
+      liveFeed: document.getElementById("liveFeed"),
+      sessionList: document.getElementById("sessionList"),
+      liveRequestsMeta: document.getElementById("liveRequestsMeta"),
+      savedRequestsMeta: document.getElementById("savedRequestsMeta"),
+      liveRequestsList: document.getElementById("liveRequestsList"),
+      savedRequestsList: document.getElementById("savedRequestsList"),
+      listView: document.getElementById("listView"),
+      detailView: document.getElementById("detailView"),
+      backToList: document.getElementById("backToList"),
+      detailEyebrow: document.getElementById("detailEyebrow"),
+      detailTitle: document.getElementById("detailTitle"),
+      detailSubtitle: document.getElementById("detailSubtitle"),
+      detailNote: document.getElementById("detailNote"),
+      summaryGrid: document.getElementById("summaryGrid"),
+      inputPane: document.getElementById("inputPane"),
+      outputPane: document.getElementById("outputPane"),
+    };
+
+    let refreshTimer = null;
+    let activeLoadToken = 0;
+
+    async function fetchJson(url) {
+      const res = await fetch(url);
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || `HTTP ${res.status}`);
+      }
+      return res.json();
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;");
+    }
+
+    function formatDate(value) {
+      if (!value) return "Unknown time";
+      return new Date(value).toLocaleString();
+    }
+
+    function formatMoney(value) {
+      if (value == null || value === "") return "n/a";
+      return `€${value}`;
+    }
+
+    function shorten(text, limit = 140) {
+      const value = String(text || "");
+      return value.length > limit ? `${value.slice(0, limit - 1)}…` : value;
+    }
+
+    function setSelectOptions(select, options, placeholder) {
+      const current = select.value;
+      select.innerHTML = "";
+      if (placeholder) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = placeholder;
+        select.appendChild(option);
+      }
+
+      for (const item of options) {
+        const option = document.createElement("option");
+        option.value = item.value;
+        option.textContent = item.label;
+        select.appendChild(option);
+      }
+
+      if ([...select.options].some((option) => option.value === current)) {
+        select.value = current;
+      }
+    }
+
+    function renderDatabaseOptions() {
+      els.database.innerHTML = "";
+
+      for (const db of state.databases) {
+        const option = document.createElement("option");
+        option.value = db.name;
+        const count = typeof db.sessionCount === "number" ? `${db.sessionCount} sessions` : db.error;
+        option.textContent = `${db.name} · ${count}`;
+        els.database.appendChild(option);
+      }
+
+      if (!state.selectedDatabase && state.databases.length) {
+        const preferred = state.databases.find((db) => db.name === "digital_ai_index_db");
+        state.selectedDatabase = preferred ? preferred.name : state.databases[0].name;
+      }
+
+      els.database.value = state.selectedDatabase;
+    }
+
+    function formatUsage(usage) {
+      if (!usage || typeof usage !== "object") {
+        return "n/a";
+      }
+
+      const input = usage.input_tokens
+        ?? usage.inputTokens
+        ?? usage.input_tokens_no_cache
+        ?? usage.prompt_tokens
+        ?? null;
+      const output = usage.output_tokens
+        ?? usage.outputTokens
+        ?? usage.completion_tokens
+        ?? null;
+      const total = usage.total_tokens
+        ?? usage.totalTokens
+        ?? ((input != null || output != null) ? (Number(input || 0) + Number(output || 0)) : null);
+
+      const parts = [];
+      if (input != null) parts.push(`in ${input}`);
+      if (output != null) parts.push(`out ${output}`);
+      if (total != null) parts.push(`total ${total}`);
+      return parts.length ? parts.join(" · ") : JSON.stringify(usage);
+    }
+
+    function formatToolUsage(usage) {
+      if (!usage || typeof usage !== "object") {
+        return "n/a";
+      }
+
+      const searches = usage.server_tool_use?.web_search_requests;
+      const fetches = usage.server_tool_use?.web_fetch_requests;
+      const thinking = usage.output_tokens_details?.thinking_tokens;
+      const parts = [];
+
+      if (searches != null) parts.push(`web searches ${searches}`);
+      if (fetches != null) parts.push(`web fetches ${fetches}`);
+      if (thinking != null) parts.push(`thinking ${thinking}`);
+
+      return parts.length ? parts.join(" · ") : "n/a";
+    }
+
+    function formatRequestKind(request) {
+      const bits = [request.request_kind || "request"];
+      if (request.season_name) bits.push(request.season_name);
+      if (request.travel_time_frame) bits.push(request.travel_time_frame);
+      return bits.join(" · ");
+    }
+
+    function formatSessionStatus(entry) {
+      return entry.session_status || entry.request_status || "running";
+    }
+
+    function formatFeedRequestLabel(entry) {
+      const bits = [entry.request_kind || "request"];
+      if (entry.season_name) bits.push(entry.season_name);
+      if (entry.travel_time_frame) bits.push(entry.travel_time_frame);
+      return bits.join(" · ");
+    }
+
+    function getRequestStatusClass(status) {
+      if (status === "completed") return "status-completed";
+      if (status === "failed") return "status-failed";
+      return "status-running";
+    }
+
+    function sourceListHtml(sources) {
+      if (!Array.isArray(sources) || !sources.length) {
+        return "";
+      }
+
+      return `
+        <details open>
+          <summary>Citations / Sources (${sources.length})</summary>
+          <ul class="source-list">
+            ${sources.map((source) => {
+              if (typeof source === "string") {
+                return `<li><div>${escapeHtml(source)}</div></li>`;
+              }
+
+              return `
+                <li>
+                  <div>${escapeHtml(source?.title || source?.url || "Untitled source")}</div>
+                  ${source?.url ? `<a class="source-link" href="${escapeHtml(source.url)}" target="_blank" rel="noreferrer">${escapeHtml(source.url)}</a>` : ""}
+                </li>
+              `;
+            }).join("")}
+          </ul>
+        </details>
+      `;
+    }
+
+    function providerEventsHtml(request) {
+      const events = Array.isArray(request?.response_meta_json?.providerEvents)
+        ? request.response_meta_json.providerEvents
+        : [];
+
+      if (!events.length) {
+        return "";
+      }
+
+      return `
+        <details open>
+          <summary>Provider events (${events.length})</summary>
+          <ul class="source-list">
+            ${events.map((event) => `
+              <li>
+                <div>step ${escapeHtml(event.sequence || "?")} · ${escapeHtml(event.stopReason || "unknown")} · ${escapeHtml(formatUsage(event.usage))}</div>
+                <div class="request-secondary mono">${escapeHtml(event.providerRequestId || "no request id")}</div>
+                <div class="request-secondary">${escapeHtml(formatDate(event.createdAt))}</div>
+              </li>
+            `).join("")}
+          </ul>
+        </details>
+      `;
+    }
+
+    function formatOutputPreview(request) {
+      if (request.answer_text) {
+        return shorten(String(request.answer_text).replace(/\s+/g, " "), 110);
+      }
+
+      if (request.status === "failed") {
+        return request.error_message
+          ? `Failed: ${shorten(request.error_message.replace(/\s+/g, " "), 90)}`
+          : "<failed>";
+      }
+
+      return "<no output>";
+    }
+
+    function requestRowHtml(request, source = "saved") {
+      const isActive =
+        source === "live"
+          ? state.selectedDetailSource === "live" &&
+            String(request.live_request_id || request.request_log_id) ===
+              String(state.selectedLiveRequestId)
+          : state.selectedDetailSource === "saved" &&
+            String(request.request_log_id) === String(state.selectedRequestLogId);
+      const activeClass = isActive ? "active" : "";
+      const status = request.status || "started";
+      const statusClass = getRequestStatusClass(status);
+      const outputId =
+        request.completion_id ||
+        request.provider_request_id ||
+        (source === "live"
+          ? request.live_request_id || `live #${request.request_log_id}`
+          : `log #${request.request_log_id}`);
+      const inputMeta = `${request.destination_name || "Unknown destination"} · ${request.interest_type || "Unknown group"} · ${formatRequestKind(request)}`;
+      const modelMeta = [request.provider_name, request.model_name].filter(Boolean).join(" · ");
+
+      return `
+        <button class="request-row ${activeClass}" data-request-source="${escapeHtml(source)}" data-request-id="${escapeHtml(source === "live" ? (request.live_request_id || request.request_log_id) : request.request_log_id)}">
+          <span class="request-cell">
+            <div class="request-primary">${escapeHtml(shorten(request.prompt_text || "", 120))}</div>
+            <div class="request-secondary">${escapeHtml(inputMeta)}</div>
+          </span>
+          <span class="request-cell">
+            <div class="request-primary">${escapeHtml(formatOutputPreview(request))}</div>
+            <div class="request-secondary mono">${escapeHtml(outputId)}</div>
+          </span>
+          <span class="request-cell request-model">
+            <div class="request-primary">${escapeHtml(modelMeta || "unknown model")}</div>
+            <div class="request-secondary">${escapeHtml(formatUsage(request.usage_json))}</div>
+          </span>
+          <span class="request-cell request-created">
+            <div class="request-primary">${escapeHtml(formatDate(request.started_at))}</div>
+            <div class="request-secondary"><span class="pill ${statusClass}">${escapeHtml(status)}</span></div>
+          </span>
+        </button>
+      `;
+    }
+
+    function liveFeedEntryHtml(entry) {
+      const status = formatSessionStatus(entry);
+      const statusClass = status === "failed" ? "failed" : status === "completed" ? "" : "running";
+      const promptTarget = Number(entry.prompt_target || state.promptTarget || 6);
+      const completed = Number(entry.completed_requests || 0);
+      const currentLine = [
+        `current request: ${formatFeedRequestLabel(entry)}`,
+        entry.provider_request_id ? `provider req ${entry.provider_request_id}` : null,
+        entry.completion_id ? `completion ${entry.completion_id}` : null,
+      ].filter(Boolean).join(" · ");
+
+      const tokenLine = formatUsage(entry.usage_json);
+      const errorLine = entry.error_message ? `error: ${entry.error_message}` : "";
+
+      return `
+        <div class="terminal-entry">
+<span class="terminal-time">[${escapeHtml(formatDate(entry.latest_activity_at || entry.started_at))}]</span> Session -> profile ${escapeHtml(entry.profile_id)}, group: ${escapeHtml(entry.interest_type || "?")}, repeat: ${escapeHtml(entry.repeat_index ?? "?")}
+  session_id: ${escapeHtml(entry.session_id || "n/a")}
+  status: <span class="terminal-status ${statusClass}">${escapeHtml(status)}</span> · destination: ${escapeHtml(entry.destination_name || "Unknown destination")}
+  completed prompts: ${escapeHtml(completed)}/${escapeHtml(promptTarget)}
+  ${escapeHtml(currentLine || "current request: n/a")}
+  tokens: ${escapeHtml(tokenLine)}
+${errorLine ? `  ${escapeHtml(errorLine)}\n` : ""}</div>
+      `;
+    }
+
+    function getVisiblePageNumbers(currentPage, totalPages) {
+      if (totalPages <= 7) {
+        return Array.from({ length: totalPages }, (_, index) => index + 1);
+      }
+
+      const pages = new Set([1, totalPages, currentPage, currentPage - 1, currentPage + 1]);
+      const filtered = [...pages]
+        .filter((page) => page >= 1 && page <= totalPages)
+        .sort((a, b) => a - b);
+
+      const withGaps = [];
+      for (let index = 0; index < filtered.length; index += 1) {
+        const page = filtered[index];
+        const previous = filtered[index - 1];
+
+        if (index > 0 && page - previous > 1) {
+          withGaps.push("…");
+        }
+
+        withGaps.push(page);
+      }
+
+      return withGaps;
+    }
+
+    function pagerHtml() {
+      if (!state.totalRequests) {
+        return "";
+      }
+
+      const start = (state.currentPage - 1) * state.pageSize + 1;
+      const end = Math.min(state.currentPage * state.pageSize, state.totalRequests);
+      const pages = getVisiblePageNumbers(state.currentPage, state.totalPages);
+
+      return `
+        <div class="pager">
+          <div class="pager-info">Showing ${escapeHtml(start)}-${escapeHtml(end)} of ${escapeHtml(state.totalRequests)} requests</div>
+          <div class="pager-controls">
+            <button class="pager-button" data-page="${state.currentPage - 1}" ${state.currentPage <= 1 ? "disabled" : ""}>Prev</button>
+            ${pages.map((page) => {
+              if (page === "…") {
+                return `<button class="pager-button" disabled>…</button>`;
+              }
+
+              return `<button class="pager-button ${page === state.currentPage ? "active" : ""}" data-page="${page}">${page}</button>`;
+            }).join("")}
+            <button class="pager-button" data-page="${state.currentPage + 1}" ${state.currentPage >= state.totalPages ? "disabled" : ""}>Next</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderLiveFeed() {
+      const count = state.liveFeed.length;
+      els.terminalMeta.textContent = count
+        ? `${count} latest sessions · refresh ${Math.round(REFRESH_MS / 1000)}s`
+        : "No matching sessions";
+
+      if (!count) {
+        els.liveFeed.innerHTML = `<div class="terminal-empty">No live session rows yet for the current filters.</div>`;
+        return;
+      }
+
+      els.liveFeed.innerHTML = state.liveFeed.map(liveFeedEntryHtml).join("");
+      els.liveFeed.scrollTop = 0;
+    }
+
+    function bindRequestRowClicks(root) {
+      root.querySelectorAll(".request-row").forEach((button) => {
+        button.addEventListener("click", () => {
+          const source = button.dataset.requestSource || "saved";
+          const requestId = button.dataset.requestId;
+
+          if (source === "live") {
+            loadLiveRequest(requestId).catch(showError);
+            return;
+          }
+
+          loadRequest(requestId).catch(showError);
+        });
+      });
+    }
+
+    function renderLiveRequests() {
+      const count = state.liveRequests.length;
+      els.liveRequestsMeta.textContent = state.totalLiveRequests
+        ? `${state.totalLiveRequests} uncommitted request traces`
+        : "No active or failed live traces";
+
+      if (!count) {
+        els.liveRequestsList.innerHTML = `
+          <div class="empty">
+            <div>
+              <h2>No live requests</h2>
+              <p>Start a Claude run and the in-progress prompts will appear here before the session commits.</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      els.liveRequestsList.innerHTML = `
+        <div class="request-table">
+          <div class="request-head">
+            <div class="request-header-cell">Input</div>
+            <div class="request-header-cell">Output</div>
+            <div class="request-header-cell">Model</div>
+            <div class="request-header-cell">Created</div>
+          </div>
+          ${state.liveRequests.map((request) => requestRowHtml(request, "live")).join("")}
+        </div>
+      `;
+      bindRequestRowClicks(els.liveRequestsList);
+    }
+
+    function renderRequests() {
+      const count = state.totalRequests;
+      els.savedRequestsMeta.textContent = count
+        ? `${count} committed request logs`
+        : "No committed request logs match the current search";
+
+      if (!state.requests.length) {
+        els.savedRequestsList.innerHTML = `
+          <div class="empty">
+            <div>
+              <h2>No saved matches</h2>
+              <p>Try another database or loosen the search.</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      els.savedRequestsList.innerHTML = `
+        <div class="list-shell">
+          <div class="request-table">
+            <div class="request-head">
+              <div class="request-header-cell">Input</div>
+              <div class="request-header-cell">Output</div>
+              <div class="request-header-cell">Model</div>
+              <div class="request-header-cell">Created</div>
+            </div>
+            ${state.requests.map((request) => requestRowHtml(request, "saved")).join("")}
+          </div>
+          ${pagerHtml()}
+        </div>
+      `;
+      bindRequestRowClicks(els.savedRequestsList);
+
+      els.savedRequestsList.querySelectorAll(".pager-button[data-page]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const nextPage = Number(button.dataset.page);
+          if (!nextPage || nextPage === state.currentPage) {
+            return;
+          }
+
+          state.currentPage = nextPage;
+          state.selectedRequestLogId = "";
+          setViewMode("list");
+          loadRequests().catch(showError);
+        });
+      });
+    }
+
+    function renderSummary(request, session, threadLength) {
+      const boxes = [
+        ["Database", state.selectedDatabase],
+        ["Request log ID", request.request_log_id],
+        ["Completion ID", request.completion_id || "n/a"],
+        ["Provider request ID", request.provider_request_id || "n/a"],
+        ["Session ID", request.session_id || "n/a"],
+        ["Request kind", formatRequestKind(request)],
+        ["Provider / model", `${request.provider_name || "?"} · ${request.model_name || "?"}`],
+        ["Status", request.status || "started"],
+        ["Profile", `${request.profile_id || "?"} · ${request.profile_name || "Unknown"}`],
+        ["Travel setup", `${request.age || "?"} · ${request.gender || "?"} · ${request.travel_party || "?"}`],
+        ["Stay / budget", `${request.stay_nights || "?"} nights · ${formatMoney(request.budget_per_day_eur)}/day`],
+        ["Group / repeat", `${request.interest_type || "?"} · repeat ${request.repeat_index ?? "?"}`],
+        ["Tokens", formatUsage(request.usage_json)],
+        ["Tool usage", formatToolUsage(request.usage_json)],
+        ["Context turns", `${threadLength} saved turns`],
+        ["Started", formatDate(request.started_at)],
+        ["Finished", formatDate(request.finished_at)],
+      ];
+
+      if (request.travel_time_frame) {
+        boxes.push(["Travel time frame", request.travel_time_frame]);
+      }
+
+      if (request.run_notes || session?.run_notes) {
+        boxes.push(["Run notes", request.run_notes || session?.run_notes]);
+      }
+
+      if (request.params_json) {
+        boxes.push(["Params", JSON.stringify(request.params_json)]);
+      }
+
+      if (request.error_message) {
+        boxes.push(["Error", request.error_message]);
+      }
+
+      els.summaryGrid.innerHTML = boxes
+        .map(([k, v]) => `
+          <div class="summary-box">
+            <span class="k">${escapeHtml(k)}</span>
+            <span class="v ${/ID|Tokens/.test(k) ? "mono" : ""}">${escapeHtml(v)}</span>
+          </div>
+        `)
+        .join("");
+    }
+
+    function setViewMode(mode) {
+      const detailOpen = mode === "detail";
+      els.listView.classList.toggle("hidden", detailOpen);
+      els.detailView.classList.toggle("hidden", !detailOpen);
+    }
+
+    function entryMetaHtml(turn) {
+      const footerBits = [];
+
+      if (turn.completionId) {
+        footerBits.push(`completion ${turn.completionId}`);
+      }
+
+      if (turn.providerRequestId) {
+        footerBits.push(`provider req ${turn.providerRequestId}`);
+      }
+
+      if (turn.usage) {
+        footerBits.push(formatUsage(turn.usage));
+      }
+
+      if (turn.createdAt) {
+        footerBits.push(formatDate(turn.createdAt));
+      }
+
+      return footerBits.length
+        ? `<div class="entry-meta">${footerBits.map((bit) => `<span>${escapeHtml(bit)}</span>`).join("")}</div>`
+        : "";
+    }
+
+    function historyEntryHtml(turn) {
+      const roleClass = turn.role === "assistant" ? "assistant" : "user";
+      return `
+        <section class="entry-block">
+          <div class="entry-label">${escapeHtml(turn.role === "assistant" ? "Assistant context" : "User")}</div>
+          <div class="entry-copy ${roleClass}">${escapeHtml(turn.text || "")}</div>
+          ${entryMetaHtml(turn)}
+          ${sourceListHtml(turn.sources)}
+        </section>
+      `;
+    }
+
+    function outputEntryHtml(request) {
+      const parts = [];
+
+      if (request.error_message) {
+        parts.push(`
+          <section class="entry-block">
+            <div class="entry-label">Failure</div>
+            <div class="entry-copy">${escapeHtml(request.error_message)}</div>
+          </section>
+        `);
+      } else if (request.answer_text) {
+        parts.push(`
+          <section class="entry-block">
+            <div class="entry-label">Assistant</div>
+            <div class="entry-copy assistant">${escapeHtml(request.answer_text)}</div>
+            <div class="entry-meta">
+              <span>${escapeHtml(formatUsage(request.usage_json))}</span>
+              <span>${escapeHtml(request.completion_id || "no completion id")}</span>
+            </div>
+            ${sourceListHtml(request.sources_json)}
+          </section>
+        `);
+      } else {
+        parts.push(`
+          <section class="entry-block">
+            <div class="entry-label">Pending</div>
+            <div class="entry-copy mono">&lt;no output&gt;</div>
+          </section>
+        `);
+      }
+
+      const providerHtml = providerEventsHtml(request);
+      if (providerHtml) {
+        parts.unshift(providerHtml);
+      }
+
+      return parts.join("");
+    }
+
+    function renderRequestDetail(payload) {
+      const { request, session, contextTurns, note } = payload;
+      const status = request.status || "started";
+      const historyTurns = (contextTurns || []).filter(
+        (turn) => turn.label !== "Current saved answer" && turn.label !== "Failure",
+      );
+
+      els.detailEyebrow.textContent = `${status} · ${request.provider_name || "provider"} · ${request.model_name || "model"}`;
+      els.detailTitle.textContent = `${formatRequestKind(request)} · ${request.destination_name || "Unknown destination"}`;
+      els.detailSubtitle.textContent = `${request.profile_name || `Profile ${request.profile_id}`} · ${formatDate(request.started_at)} · tokens ${formatUsage(request.usage_json)}`;
+      els.detailNote.textContent = note || "";
+
+      renderSummary(request, session, historyTurns.length);
+
+      els.inputPane.innerHTML = historyTurns.length
+        ? historyTurns.map(historyEntryHtml).join("")
+        : `
+          <div class="empty">
+            <div>
+              <h2>No saved input</h2>
+              <p>This request row has no saved message history.</p>
+            </div>
+          </div>
+        `;
+
+      els.outputPane.innerHTML = outputEntryHtml(request);
+      setViewMode("detail");
+    }
+
+    function renderEmptyDetail(title, message) {
+      els.detailEyebrow.textContent = "No request selected";
+      els.detailTitle.textContent = title;
+      els.detailSubtitle.textContent = message;
+      els.detailNote.textContent = "";
+      els.summaryGrid.innerHTML = "";
+      els.inputPane.innerHTML = `
+        <div class="empty">
+          <div>
+            <h2>${escapeHtml(title)}</h2>
+            <p>${escapeHtml(message)}</p>
+          </div>
+        </div>
+      `;
+      els.outputPane.innerHTML = `
+        <div class="empty">
+          <div>
+            <h2>No output yet</h2>
+            <p>Select a request row to inspect its response.</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function getFilterParams() {
+      const params = new URLSearchParams();
+      params.set("database", state.selectedDatabase);
+      params.set("page", String(state.currentPage));
+      params.set("pageSize", String(state.pageSize));
+
+      const query = els.q.value.trim();
+      if (query) {
+        params.set("q", query);
+      }
+
+      return params;
+    }
+
+    function applyLiveFeedPayload(payload) {
+      state.liveFeed = payload.feed || [];
+      state.promptTarget = payload.promptTarget || 6;
+      renderLiveFeed();
+    }
+
+    async function fetchLiveFeedPayload() {
+      if (!state.selectedDatabase) {
+        return { feed: [] };
+      }
+
+      const params = getFilterParams();
+      params.set("feedLimit", "40");
+      return fetchJson(`/api/live-feed?${params.toString()}`);
+    }
+
+    function applyLiveRequestsPayload(payload) {
+      state.liveRequests = payload.requests || [];
+      state.totalLiveRequests = payload.totalCount || 0;
+      renderLiveRequests();
+    }
+
+    async function fetchLiveRequestsPayload() {
+      if (!state.selectedDatabase) {
+        return { requests: [], totalCount: 0 };
+      }
+
+      const params = new URLSearchParams();
+      params.set("database", state.selectedDatabase);
+      params.set("liveLimit", "20");
+
+      const query = els.q.value.trim();
+      if (query) {
+        params.set("q", query);
+      }
+
+      return fetchJson(`/api/live-requests?${params.toString()}`);
+    }
+
+    async function loadRequests() {
+      if (!state.selectedDatabase) {
+        return;
+      }
+
+      const loadToken = ++activeLoadToken;
+      const [payload, liveFeedPayload, liveRequestsPayload] = await Promise.all([
+        fetchJson(`/api/requests?${getFilterParams().toString()}`),
+        fetchLiveFeedPayload(),
+        fetchLiveRequestsPayload(),
+      ]);
+
+      if (loadToken !== activeLoadToken) {
+        return;
+      }
+
+      state.requests = payload.requests || [];
+      state.currentPage = payload.page || 1;
+      state.totalPages = payload.totalPages || 0;
+      state.totalRequests = payload.totalCount || 0;
+      state.pageSize = payload.pageSize || REQUESTS_PER_PAGE;
+      applyLiveFeedPayload(liveFeedPayload);
+      applyLiveRequestsPayload(liveRequestsPayload);
+
+      renderRequests();
+
+      if (!state.requests.length) {
+        state.selectedRequestLogId = "";
+      }
+
+      const stillExists = state.requests.some(
+        (request) => String(request.request_log_id) === String(state.selectedRequestLogId),
+      );
+
+      if (!stillExists) {
+        state.selectedRequestLogId = "";
+      }
+
+      const liveStillExists = state.liveRequests.some(
+        (request) =>
+          String(request.live_request_id || request.request_log_id) ===
+          String(state.selectedLiveRequestId),
+      );
+
+      if (!liveStillExists) {
+        state.selectedLiveRequestId = "";
+        if (state.selectedDetailSource === "live") {
+          setViewMode("list");
+        }
+      }
+
+      if (
+        state.selectedDetailSource === "saved" &&
+        state.selectedRequestLogId &&
+        !els.detailView.classList.contains("hidden")
+      ) {
+        await loadRequest(state.selectedRequestLogId, { fromRefresh: true });
+      } else if (
+        state.selectedDetailSource === "live" &&
+        state.selectedLiveRequestId &&
+        !els.detailView.classList.contains("hidden")
+      ) {
+        await loadLiveRequest(state.selectedLiveRequestId, { fromRefresh: true });
+      } else if (!state.selectedRequestLogId && !state.selectedLiveRequestId) {
+        setViewMode("list");
+      }
+    }
+
+    async function loadRequest(requestLogId, options = {}) {
+      if (!requestLogId || !state.selectedDatabase) {
+        return;
+      }
+
+      state.selectedRequestLogId = String(requestLogId);
+      state.selectedLiveRequestId = "";
+      state.selectedDetailSource = "saved";
+      if (!options.fromRefresh) {
+        renderRequests();
+        renderLiveRequests();
+      }
+
+      const payload = await fetchJson(
+        `/api/request?database=${encodeURIComponent(state.selectedDatabase)}&requestLogId=${encodeURIComponent(requestLogId)}`,
+      );
+      renderRequests();
+      renderLiveRequests();
+      renderRequestDetail(payload);
+    }
+
+    async function loadLiveRequest(liveRequestId, options = {}) {
+      if (!liveRequestId || !state.selectedDatabase) {
+        return;
+      }
+
+      state.selectedLiveRequestId = String(liveRequestId);
+      state.selectedRequestLogId = "";
+      state.selectedDetailSource = "live";
+      if (!options.fromRefresh) {
+        renderLiveRequests();
+        renderRequests();
+      }
+
+      const payload = await fetchJson(
+        `/api/live-request?database=${encodeURIComponent(state.selectedDatabase)}&liveRequestId=${encodeURIComponent(liveRequestId)}`,
+      );
+      renderLiveRequests();
+      renderRequests();
+      renderRequestDetail(payload);
+    }
+
+    function showError(error) {
+      const message = error?.message || String(error);
+      els.liveRequestsMeta.textContent = "Viewer error";
+      els.savedRequestsMeta.textContent = "Viewer error";
+      els.liveRequestsList.innerHTML = `
+        <div class="empty">
+          <div>
+            <h2>Viewer error</h2>
+            <p>${escapeHtml(message)}</p>
+          </div>
+        </div>
+      `;
+      els.savedRequestsList.innerHTML = `
+        <div class="empty">
+          <div>
+            <h2>Viewer error</h2>
+            <p>${escapeHtml(message)}</p>
+          </div>
+        </div>
+      `;
+      renderEmptyDetail("Viewer error", message);
+    }
+
+    function bindFilters() {
+      els.backToList.addEventListener("click", () => {
+        setViewMode("list");
+      });
+
+      els.database.addEventListener("change", async () => {
+        state.selectedDatabase = els.database.value;
+        state.selectedRequestLogId = "";
+        state.selectedLiveRequestId = "";
+        state.selectedDetailSource = "saved";
+        state.currentPage = 1;
+        setViewMode("list");
+        await loadRequests();
+      });
+
+      let debounceTimer = null;
+      els.q.addEventListener("input", () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          state.selectedRequestLogId = "";
+          state.selectedLiveRequestId = "";
+          state.selectedDetailSource = "saved";
+          state.currentPage = 1;
+          setViewMode("list");
+          loadRequests().catch(showError);
+        }, 250);
+      });
+    }
+
+    function startAutoRefresh() {
+      if (refreshTimer) {
+        clearInterval(refreshTimer);
+      }
+
+      refreshTimer = setInterval(() => {
+        if (document.hidden || !state.selectedDatabase) {
+          return;
+        }
+
+        loadRequests().catch(showError);
+      }, REFRESH_MS);
+    }
+
+    async function init() {
+      const payload = await fetchJson("/api/databases");
+      state.databases = payload.databases || [];
+      renderDatabaseOptions();
+      bindFilters();
+      startAutoRefresh();
+      await loadRequests();
+    }
+
+    init().catch(showError);
+  </script>
+</body>
+</html>

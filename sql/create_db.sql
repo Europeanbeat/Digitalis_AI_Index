@@ -37,6 +37,7 @@ CREATE TABLE session_runs (
     destination_name VARCHAR(255), -- a futáskor használt desztináció neve
     provider_name VARCHAR(100), -- pl. openai / anthropic / google
     model_name VARCHAR(100), -- melyik modell futott
+    run_notes TEXT, -- szabad szöveges megjegyzés a futtatáshoz
     status VARCHAR(50) NOT NULL DEFAULT 'running', -- running / completed / failed
     error_message TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -51,6 +52,43 @@ ON session_runs (
     model_name
 )
 WHERE status IN ('running', 'completed');
+
+
+CREATE TABLE request_logs (
+    request_log_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    session_id VARCHAR(255) NOT NULL, -- intentionally not FK: live request logs must survive before/after session transaction boundaries
+    profile_id INT,
+    interest_group_id INT,
+    interest_id INT,
+    request_order INT NOT NULL,
+    request_kind VARCHAR(50) NOT NULL, -- general / constraint / comparison
+    branch_label VARCHAR(255),
+    season_name VARCHAR(100),
+    travel_time_frame VARCHAR(255),
+    repeat_index INT NOT NULL DEFAULT 1,
+    destination_name VARCHAR(255),
+    provider_name VARCHAR(100),
+    model_name VARCHAR(100),
+    run_notes TEXT,
+    status VARCHAR(50) NOT NULL DEFAULT 'started', -- started / completed / failed
+    prompt_text TEXT,
+    message_history_json JSONB, -- exact saved input context sent to the provider
+    completion_id VARCHAR(255),
+    provider_request_id VARCHAR(255), -- e.g. Anthropic req_* when available
+    answer_text TEXT,
+    sources_json JSONB,
+    usage_json JSONB,
+    response_meta_json JSONB,
+    error_message TEXT,
+    started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    finished_at TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS request_logs_session_idx
+ON request_logs (session_id, request_order);
+CREATE INDEX IF NOT EXISTS request_logs_completion_idx
+ON request_logs (completion_id);
+CREATE INDEX IF NOT EXISTS request_logs_started_idx
+ON request_logs (started_at DESC);
 
 
 CREATE TABLE general_prompt_answers (

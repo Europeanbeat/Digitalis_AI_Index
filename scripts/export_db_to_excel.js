@@ -251,6 +251,7 @@ async function main() {
           destination_name,
           provider_name,
           model_name,
+          run_notes,
           status,
           error_message,
           created_at
