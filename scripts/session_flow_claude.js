@@ -55,7 +55,27 @@ const WEB_SEARCH_TIMEZONE =
 const WEB_SEARCH_CITY =
   process.env.ANTHROPIC_WEB_SEARCH_CITY || process.env.WEB_SEARCH_CITY || null;
 const ANTHROPIC_MAX_TOKENS = Number(process.env.ANTHROPIC_MAX_TOKENS || 4096);
-const MAX_PAUSE_TURNS = Number(process.env.ANTHROPIC_MAX_PAUSE_TURNS || 8);
+const MAX_PAUSE_TURNS = Number(
+  process.env.ANTHROPIC_MAX_PAUSE_TURNS || Math.max(MAX_TOOL_CALLS, 2),
+);
+const MAX_PROVIDER_EVENTS_PER_REQUEST = Number(
+  process.env.ANTHROPIC_MAX_PROVIDER_EVENTS_PER_REQUEST || MAX_PAUSE_TURNS + 1,
+);
+const MAX_TOTAL_INPUT_TOKENS_PER_REQUEST = Number(
+  process.env.ANTHROPIC_MAX_TOTAL_INPUT_TOKENS_PER_REQUEST || 0,
+);
+const MAX_TOTAL_OUTPUT_TOKENS_PER_REQUEST = Number(
+  process.env.ANTHROPIC_MAX_TOTAL_OUTPUT_TOKENS_PER_REQUEST || 0,
+);
+const MAX_CONSECUTIVE_LOW_OUTPUT_PAUSE_TURNS = Number(
+  process.env.ANTHROPIC_MAX_CONSECUTIVE_LOW_OUTPUT_PAUSE_TURNS || 3,
+);
+const LOW_OUTPUT_TOKEN_THRESHOLD = Number(
+  process.env.ANTHROPIC_LOW_OUTPUT_TOKEN_THRESHOLD || 250,
+);
+const LOW_OUTPUT_TEXT_THRESHOLD = Number(
+  process.env.ANTHROPIC_LOW_OUTPUT_TEXT_THRESHOLD || 80,
+);
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
 if (!ANTHROPIC_API_KEY) {
@@ -209,6 +229,19 @@ function buildLiveParams() {
     topP: TOP_P,
     maxTokens: ANTHROPIC_MAX_TOKENS,
     maxToolCalls: MAX_TOOL_CALLS,
+    maxPauseTurns: MAX_PAUSE_TURNS,
+    maxProviderEventsPerRequest: MAX_PROVIDER_EVENTS_PER_REQUEST,
+    maxTotalInputTokensPerRequest:
+      MAX_TOTAL_INPUT_TOKENS_PER_REQUEST > 0
+        ? MAX_TOTAL_INPUT_TOKENS_PER_REQUEST
+        : null,
+    maxTotalOutputTokensPerRequest:
+      MAX_TOTAL_OUTPUT_TOKENS_PER_REQUEST > 0
+        ? MAX_TOTAL_OUTPUT_TOKENS_PER_REQUEST
+        : null,
+    maxConsecutiveLowOutputPauseTurns: MAX_CONSECUTIVE_LOW_OUTPUT_PAUSE_TURNS,
+    lowOutputTokenThreshold: LOW_OUTPUT_TOKEN_THRESHOLD,
+    lowOutputTextThreshold: LOW_OUTPUT_TEXT_THRESHOLD,
     requestTimeoutMs: REQUEST_TIMEOUT_MS,
     maxApiRetries: MAX_API_RETRIES,
     retryBaseDelayMs: RETRY_BASE_DELAY_MS,
@@ -344,19 +377,49 @@ async function runChat(messages, options = {}) {
   const conversation = cloneClaudeMessages(messages);
   const providerEvents = [];
   let pauseTurnCount = 0;
+  let cumulativeInputTokens = 0;
+  let cumulativeOutputTokens = 0;
+  let consecutiveLowOutputPauseTurns = 0;
   const onProviderEvent =
     typeof options.onProviderEvent === "function" ? options.onProviderEvent : null;
 
   while (true) {
     try {
       const completion = await createClaudeMessage(conversation);
+      const usage = getUsage(completion);
+      const inputTokens = Number(usage?.input_tokens || 0);
+      const outputTokens = Number(usage?.output_tokens || 0);
+      const assistantText = getAssistantText(completion);
+      const assistantTextLength =
+        assistantText && assistantText !== "(No text returned)"
+          ? assistantText.trim().length
+          : 0;
+      const stopReason = completion?.stop_reason || null;
+      const isLowOutputPauseTurn =
+        stopReason === "pause_turn" &&
+        outputTokens <= LOW_OUTPUT_TOKEN_THRESHOLD &&
+        assistantTextLength <= LOW_OUTPUT_TEXT_THRESHOLD;
+
+      cumulativeInputTokens += inputTokens;
+      cumulativeOutputTokens += outputTokens;
+      consecutiveLowOutputPauseTurns = isLowOutputPauseTurn
+        ? consecutiveLowOutputPauseTurns + 1
+        : 0;
+
       const providerEvent = {
         sequence: providerEvents.length + 1,
         providerRequestId: getProviderRequestId(completion),
         completionId: completion?.id || null,
-        stopReason: completion?.stop_reason || null,
-        usage: getUsage(completion),
+        stopReason,
+        usage,
+        inputTokens,
+        outputTokens,
+        cumulativeInputTokens,
+        cumulativeOutputTokens,
+        assistantTextLength,
         pauseTurnCount,
+        lowOutputPauseTurn: isLowOutputPauseTurn,
+        consecutiveLowOutputPauseTurns,
         createdAt: new Date().toISOString(),
       };
       providerEvents.push(providerEvent);
@@ -366,12 +429,44 @@ async function runChat(messages, options = {}) {
 
       validateStopReason(completion);
 
+      if (providerEvents.length > MAX_PROVIDER_EVENTS_PER_REQUEST) {
+        throw new Error(
+          `Claude exceeded ANTHROPIC_MAX_PROVIDER_EVENTS_PER_REQUEST=${MAX_PROVIDER_EVENTS_PER_REQUEST} while completing one logical prompt.`,
+        );
+      }
+
+      if (
+        MAX_TOTAL_INPUT_TOKENS_PER_REQUEST > 0 &&
+        cumulativeInputTokens > MAX_TOTAL_INPUT_TOKENS_PER_REQUEST
+      ) {
+        throw new Error(
+          `Claude exceeded ANTHROPIC_MAX_TOTAL_INPUT_TOKENS_PER_REQUEST=${MAX_TOTAL_INPUT_TOKENS_PER_REQUEST} while completing one logical prompt.`,
+        );
+      }
+
+      if (
+        MAX_TOTAL_OUTPUT_TOKENS_PER_REQUEST > 0 &&
+        cumulativeOutputTokens > MAX_TOTAL_OUTPUT_TOKENS_PER_REQUEST
+      ) {
+        throw new Error(
+          `Claude exceeded ANTHROPIC_MAX_TOTAL_OUTPUT_TOKENS_PER_REQUEST=${MAX_TOTAL_OUTPUT_TOKENS_PER_REQUEST} while completing one logical prompt.`,
+        );
+      }
+
       if (completion?.stop_reason === "pause_turn") {
         pauseTurnCount += 1;
 
         if (pauseTurnCount > MAX_PAUSE_TURNS) {
           throw new Error(
             `Claude exceeded ANTHROPIC_MAX_PAUSE_TURNS=${MAX_PAUSE_TURNS} while continuing web search.`,
+          );
+        }
+
+        if (
+          consecutiveLowOutputPauseTurns >= MAX_CONSECUTIVE_LOW_OUTPUT_PAUSE_TURNS
+        ) {
+          throw new Error(
+            `Claude exceeded ANTHROPIC_MAX_CONSECUTIVE_LOW_OUTPUT_PAUSE_TURNS=${MAX_CONSECUTIVE_LOW_OUTPUT_PAUSE_TURNS} with repeated low-value pause_turn continuations.`,
           );
         }
 
@@ -481,6 +576,7 @@ async function runSession(options = {}) {
   const onProgress =
     typeof options.onProgress === "function" ? options.onProgress : null;
   const dbClient = createDbClient();
+  let emitProgress = () => {};
   let profileData = null;
   let interestGroupId = null;
   let sessionId = null;
@@ -496,7 +592,7 @@ async function runSession(options = {}) {
   try {
     currentDatabase = await getCurrentDatabaseName(dbClient);
 
-    const emitProgress = (step, extra = {}) => {
+    emitProgress = (step, extra = {}) => {
       if (!onProgress) {
         return;
       }
@@ -1100,6 +1196,11 @@ module.exports = {
   TOP_P,
   ANTHROPIC_EFFORT,
   ENABLE_THINKING,
+  MAX_TOOL_CALLS,
+  MAX_PAUSE_TURNS,
+  MAX_PROVIDER_EVENTS_PER_REQUEST,
+  MAX_CONSECUTIVE_LOW_OUTPUT_PAUSE_TURNS,
+  LOW_OUTPUT_TOKEN_THRESHOLD,
   createDbClient,
   getAllProfiles,
   getInterestGroupRows,

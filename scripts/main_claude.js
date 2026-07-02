@@ -1,6 +1,11 @@
 const {
   ANTHROPIC_EFFORT,
   ENABLE_THINKING,
+  LOW_OUTPUT_TOKEN_THRESHOLD,
+  MAX_CONSECUTIVE_LOW_OUTPUT_PAUSE_TURNS,
+  MAX_PAUSE_TURNS,
+  MAX_PROVIDER_EVENTS_PER_REQUEST,
+  MAX_TOOL_CALLS,
   TOP_P,
   runSession,
 } = require("./session_flow_claude");
@@ -64,7 +69,7 @@ function handleProgress(event) {
       break;
     case "provider_event":
       console.log(
-        `[provider] ${event.requestKind || event.interestType || "request"} · step ${event.sequence || "?"} · ${event.stopReason || "unknown"} · ${event.providerRequestId || "no request id"} · ${formatUsage(event.usage)}`,
+        `[provider] ${event.requestKind || event.interestType || "request"} · step ${event.sequence || "?"} · ${event.stopReason || "unknown"} · ${event.providerRequestId || "no request id"} · ${formatUsage(event.usage)} · cum in ${event.cumulativeInputTokens ?? "n/a"} · cum out ${event.cumulativeOutputTokens ?? "n/a"}${event.lowOutputPauseTurn ? ` · low-output pause ${event.consecutiveLowOutputPauseTurns}/${MAX_CONSECUTIVE_LOW_OUTPUT_PAUSE_TURNS}` : ""}`,
       );
       break;
     case "comparison_started":
@@ -94,10 +99,18 @@ async function main() {
   console.log(
     `Anthropic tool choice: ${ENABLE_THINKING ? "auto" : "forced web_search"}`,
   );
+  console.log(`Anthropic max tool calls: ${MAX_TOOL_CALLS}`);
   console.log(
     `Anthropic effort: ${
       ENABLE_THINKING ? ANTHROPIC_EFFORT : "(ignored while thinking is off)"
     }`,
+  );
+  console.log(`Anthropic max pause turns: ${MAX_PAUSE_TURNS}`);
+  console.log(
+    `Anthropic max provider events/request: ${MAX_PROVIDER_EVENTS_PER_REQUEST}`,
+  );
+  console.log(
+    `Anthropic low-output pause guard: ${MAX_CONSECUTIVE_LOW_OUTPUT_PAUSE_TURNS} turns at <= ${LOW_OUTPUT_TOKEN_THRESHOLD} output tokens`,
   );
 
   const result = await runSession({

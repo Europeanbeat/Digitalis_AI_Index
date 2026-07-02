@@ -5,6 +5,11 @@ const {
   TOP_P,
   ANTHROPIC_EFFORT,
   ENABLE_THINKING,
+  MAX_TOOL_CALLS,
+  MAX_PAUSE_TURNS,
+  MAX_PROVIDER_EVENTS_PER_REQUEST,
+  MAX_CONSECUTIVE_LOW_OUTPUT_PAUSE_TURNS,
+  LOW_OUTPUT_TOKEN_THRESHOLD,
   createDbClient,
   getAllProfiles,
   getInterestGroupRows,
@@ -22,6 +27,44 @@ const ESTIMATED_SECONDS_PER_SESSION = Number(
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Claude Sonnet 4.6 SYNC rates ($3 / $15 per 1M input/output). Web search is a
+// server tool billed separately (~$10 / 1000 searches; treat as an estimate).
+const INPUT_TOKEN_RATE = 3 / 1_000_000;
+const OUTPUT_TOKEN_RATE = 15 / 1_000_000;
+const WEB_SEARCH_RATE = 10 / 1000;
+
+function usd(value) {
+  return "$" + value.toFixed(3);
+}
+
+// Sum token usage across a completed session's 6 responses using the raw API
+// responses runSession already returns (general + follow-ups + comparison).
+function sumSessionUsage(result) {
+  const parts = [
+    result.general,
+    ...(result.followUps || []),
+    result.comparison,
+  ].filter(Boolean);
+
+  let input = 0;
+  let output = 0;
+  let searches = 0;
+
+  for (const part of parts) {
+    const usage = part.rawApiResponse && part.rawApiResponse.usage;
+    if (!usage) {
+      continue;
+    }
+    input += Number(usage.input_tokens || 0);
+    output += Number(usage.output_tokens || 0);
+    searches += Number(
+      (usage.server_tool_use && usage.server_tool_use.web_search_requests) || 0,
+    );
+  }
+
+  return { input, output, searches };
 }
 
 async function sessionAlreadyExists(
@@ -90,6 +133,9 @@ async function main() {
     let successfulSessions = 0;
     let skippedSessions = 0;
     let failedSessions = 0;
+    let totalInputTokens = 0;
+    let totalOutputTokens = 0;
+    let totalSearches = 0;
 
     console.log(`Profiles: ${profiles.length}`);
     if (PROFILE_ID_FILTER) {
@@ -105,10 +151,18 @@ async function main() {
     console.log(
       `Anthropic tool choice: ${ENABLE_THINKING ? "auto" : "forced web_search"}`,
     );
+    console.log(`Anthropic max tool calls: ${MAX_TOOL_CALLS}`);
     console.log(
       `Anthropic effort: ${
         ENABLE_THINKING ? ANTHROPIC_EFFORT : "(ignored while thinking is off)"
       }`,
+    );
+    console.log(`Anthropic max pause turns: ${MAX_PAUSE_TURNS}`);
+    console.log(
+      `Anthropic max provider events/request: ${MAX_PROVIDER_EVENTS_PER_REQUEST}`,
+    );
+    console.log(
+      `Anthropic low-output pause guard: ${MAX_CONSECUTIVE_LOW_OUTPUT_PAUSE_TURNS} turns at <= ${LOW_OUTPUT_TOKEN_THRESHOLD} output tokens`,
     );
     console.log(`Run notes: ${RUN_NOTES || "(none)"}`);
     console.log(`Session delay (ms): ${SESSION_DELAY_MS}`);
@@ -158,8 +212,27 @@ async function main() {
             successfulSessions += 1;
             completedPrompts += promptsPerSession;
 
+            const usage = sumSessionUsage(result);
+            totalInputTokens += usage.input;
+            totalOutputTokens += usage.output;
+            totalSearches += usage.searches;
+            const sessionCost =
+              usage.input * INPUT_TOKEN_RATE +
+              usage.output * OUTPUT_TOKEN_RATE +
+              usage.searches * WEB_SEARCH_RATE;
+            const runningCost =
+              totalInputTokens * INPUT_TOKEN_RATE +
+              totalOutputTokens * OUTPUT_TOKEN_RATE +
+              totalSearches * WEB_SEARCH_RATE;
+
             console.log(`  session_id: ${result.sessionId}`);
             console.log(`  completed prompts: ${completedPrompts}/${totalPrompts}`);
+            console.log(
+              `  tokens: in ${usage.input} · out ${usage.output} · searches ${usage.searches} · ~${usd(sessionCost)}`,
+            );
+            console.log(
+              `  running total: in ${totalInputTokens} · out ${totalOutputTokens} · searches ${totalSearches} · ~${usd(runningCost)}`,
+            );
           } catch (error) {
             failedSessions += 1;
             console.error(`  FAILED: ${error.message}`);
@@ -176,6 +249,16 @@ async function main() {
     console.log(`Successful sessions: ${successfulSessions}`);
     console.log(`Skipped sessions: ${skippedSessions}`);
     console.log(`Failed sessions: ${failedSessions}`);
+    console.log(
+      `Total tokens: in ${totalInputTokens} · out ${totalOutputTokens} · searches ${totalSearches}`,
+    );
+    console.log(
+      `Estimated cost: ${usd(
+        totalInputTokens * INPUT_TOKEN_RATE +
+          totalOutputTokens * OUTPUT_TOKEN_RATE +
+          totalSearches * WEB_SEARCH_RATE,
+      )} (Sonnet 4.6 sync rates $3/$15 per 1M; web search est. $10/1k)`,
+    );
     console.log(
       `Elapsed minutes: ${((Date.now() - startedAt) / 1000 / 60).toFixed(1)}`,
     );
